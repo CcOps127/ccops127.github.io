@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本文详细介绍gluster fs 安装配置及之后的维护 环境介绍系统版本:CentOS 6.5 x86_64 安装GlusterFS软件包123yum install -y glusterfs glusterfs-fuse glusterfs-server xfsprogs/etc/init.d/glusterd startchkconfig glusterfsd on 配置整个GlusterFS">
+<meta name="keywords" content="glusterfs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GlusterFS部署详解">
+<meta property="og:url" content="https://www.oneops.co/2017/12/19/install-glusterfs.html">
+<meta property="og:site_name" content="Cc&#39;s Blog">
+<meta property="og:description" content="本文详细介绍gluster fs 安装配置及之后的维护 环境介绍系统版本:CentOS 6.5 x86_64 安装GlusterFS软件包123yum install -y glusterfs glusterfs-fuse glusterfs-server xfsprogs/etc/init.d/glusterd startchkconfig glusterfsd on 配置整个GlusterFS">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-05-20T06:57:34.990Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GlusterFS部署详解">
+<meta name="twitter:description" content="本文详细介绍gluster fs 安装配置及之后的维护 环境介绍系统版本:CentOS 6.5 x86_64 安装GlusterFS软件包123yum install -y glusterfs glusterfs-fuse glusterfs-server xfsprogs/etc/init.d/glusterd startchkconfig glusterfsd on 配置整个GlusterFS">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.oneops.co/2017/12/19/install-glusterfs.html">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>GlusterFS部署详解 | Cc's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=71693959-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '71693959-4');
+</script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Cc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">生命不止 学习不息</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2017/12/19/install-glusterfs.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">GlusterFS部署详解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-12-19 23:52:20" itemprop="dateCreated datePublished" datetime="2017-12-19T23:52:20+08:00">2017-12-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-05-20 14:57:34" itemprop="dateModified" datetime="2019-05-20T14:57:34+08:00">2019-05-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文详细介绍gluster fs 安装配置及之后的维护</p>
+<h1 id="环境介绍"><a href="#环境介绍" class="headerlink" title="环境介绍"></a>环境介绍</h1><p>系统版本:CentOS 6.5 x86_64</p>
+<h2 id="安装GlusterFS软件包"><a href="#安装GlusterFS软件包" class="headerlink" title="安装GlusterFS软件包"></a>安装GlusterFS软件包</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install -y glusterfs glusterfs-fuse glusterfs-server xfsprogs</span><br><span class="line">/etc/init.d/glusterd start</span><br><span class="line">chkconfig glusterfsd on</span><br></pre></td></tr></table></figure>
+<h2 id="配置整个GlusterFS集群"><a href="#配置整个GlusterFS集群" class="headerlink" title="配置整个GlusterFS集群"></a>配置整个GlusterFS集群</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">gluster peer probe 172.16.18.241</span><br><span class="line">peer probe: success: on localhost not needed</span><br><span class="line"></span><br><span class="line"> gluster peer probe 172.16.18.242</span><br><span class="line">peer probe: success</span><br><span class="line"></span><br><span class="line">gluster peer probe 172.16.18.243</span><br><span class="line">peer probe: success</span><br><span class="line"></span><br><span class="line"> gluster peer probe 172.16.18.244</span><br><span class="line">peer probe: success</span><br><span class="line"></span><br><span class="line"> gluster peer status</span><br><span class="line">gluster peer status</span><br><span class="line">Number of Peers: 3</span><br><span class="line">Hostname: 172.16.18.242</span><br><span class="line">Uuid: beb0aae7-a939-45ec-a273-0c21c2f59546</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.243</span><br><span class="line">Uuid: eab486b3-d1a1-4851-b9ec-45aab1ef9a66</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.244</span><br><span class="line">Uuid: 3108764d-d6b3-4356-810d-88872d56ceb6</span><br><span class="line">State: Peer in Cluster (Connected)</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="创建数据存放目录"><a href="#创建数据存放目录" class="headerlink" title="创建数据存放目录"></a>创建数据存放目录</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">parted  /dev/sdb rm 1</span><br><span class="line">mkfs.xfs -i size=512 /dev/sdb -f</span><br><span class="line">mkdir -p /export/brick1</span><br><span class="line">/bin/mount -t xfs /dev/sdb /export/brick1</span><br><span class="line">mkdir /export/brick1/gv0</span><br></pre></td></tr></table></figure>
+<h2 id="GlusterFS磁盘"><a href="#GlusterFS磁盘" class="headerlink" title="GlusterFS磁盘"></a>GlusterFS磁盘</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">gluster volume create gv0 replica 2 172.16.18.241:/export/brick1/gv0 172.16.18.242:/export/brick1/gv0 172.16.18.243:/</span><br><span class="line">export/brick1/gv0 172.16.18.244:/export/brick1/gv0 force</span><br><span class="line"></span><br><span class="line">gluster volume start gv0</span><br><span class="line">volume create: gv0: success: please start the volume to access data</span><br><span class="line"></span><br><span class="line">gluster volume info</span><br><span class="line"> Volume Name: gv0</span><br><span class="line">Type: Distributed-Replicate</span><br><span class="line">Volume ID: e64cb61c-0f18-41b5-bf4d-c45ee085ca3b</span><br><span class="line">Status: Started</span><br><span class="line">Number of Bricks: 2 x 2 = 4</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: 172.16.18.241:/export/brick1/gv0</span><br><span class="line">Brick2: 172.16.18.242:/export/brick1/gv0</span><br><span class="line">Brick3: 172.16.18.243:/export/brick1/gv0</span><br><span class="line">Brick4: 172.16.18.244:/export/brick1/gv0</span><br><span class="line">Options Reconfigured:</span><br><span class="line">performance.readdir-ahead: on</span><br></pre></td></tr></table></figure>
+<h2 id="安装客户端并mount-GlusterFS文件系统"><a href="#安装客户端并mount-GlusterFS文件系统" class="headerlink" title="安装客户端并mount GlusterFS文件系统"></a>安装客户端并mount GlusterFS文件系统</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">wget -P /etc/yum.repos.d  http://download.gluster.org/pub/gluster/glusterfs/LATEST/CentOS/glusterfs-epel.repo</span><br><span class="line"></span><br><span class="line">yum install glusterfs glusterfs-fuse glusterfs-server</span><br><span class="line">mkdir -p /opt/vmx/gv0</span><br><span class="line">/bin/mount -t glusterfs 172.16.18.241:/gv0 /opt/vmx/gv0</span><br><span class="line">df -h</span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/centos-root   50G  5.6G   45G  12% /</span><br><span class="line">devtmpfs                  12G     0   12G   0% /dev</span><br><span class="line">tmpfs                     12G   12K   12G   1% /dev/shm</span><br><span class="line">tmpfs                     12G   25M   12G   1% /run</span><br><span class="line">tmpfs                     12G     0   12G   0% /sys/fs/cgroup</span><br><span class="line">/dev/mapper/centos-home  217G   33M  217G   1% /home</span><br><span class="line">/dev/sda1                497M  102M  395M  21% /boot</span><br><span class="line">/dev/sdb                 280G   33M  280G   1% /export/brick1</span><br><span class="line">172.16.6.60:/gv0         559G  1.6G  558G   1% /opt/vmx/gv0</span><br></pre></td></tr></table></figure>
+<h2 id="读写可用性测试"><a href="#读写可用性测试" class="headerlink" title="读写可用性测试"></a>读写可用性测试</h2><ul>
+<li>在挂载点上写入数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;172.16.18.245&quot; &gt; /opt/vmx/gv0/test.txt</span><br><span class="line">mkdir /opt/vmx/gv0/test</span><br></pre></td></tr></table></figure>
+<p>在server数据目录中进行查看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ls /export/brick1/gv0/</span><br><span class="line">test  test.txt</span><br></pre></td></tr></table></figure>
+<p><em>结果： 数据写入成功</em></p>
+<h2 id="扩容与缩减"><a href="#扩容与缩减" class="headerlink" title="扩容与缩减"></a>扩容与缩减</h2><p>扩容步骤：系统的扩容与缩减可以通过节点、brick管理达到目的</p>
+<ul>
+<li>扩容时，可以先增加系统节点，然后添加新的Brick即可</li>
+<li>缩减时，先移除Brick，然后在进行删除达到缩容目的，并保持数据不丢失</li>
+</ul>
+<h3 id="在线扩容"><a href="#在线扩容" class="headerlink" title="在线扩容"></a>在线扩容</h3><ul>
+<li>查看节点状态</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gluster peer status</span><br><span class="line">Number of Peers: 3</span><br><span class="line">Hostname: 172.16.18.242</span><br><span class="line">Uuid: 5f4f3352-6b28-471f-8c1e-a990b49f77c2</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.243</span><br><span class="line">Uuid: 3a7e17b5-4407-4ff0-8645-69cc6ace54f9</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.241</span><br><span class="line">Uuid: e19a56c0-a060-4bcc-80d8-99de3d85a484</span><br><span class="line">State: Peer in Cluster (Connected)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>增加节点</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gluster peer probe 172.16.18.245</span><br><span class="line">peer probe: success.</span><br><span class="line">gluster peer probe 172.16.18.246</span><br><span class="line">peer probe: success.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>验证节点添加</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">gluster peer status</span><br><span class="line">Number of Peers: 5</span><br><span class="line">Hostname: 172.16.18.242</span><br><span class="line">Uuid: 5f4f3352-6b28-471f-8c1e-a990b49f77c2</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.243</span><br><span class="line">Uuid: 3a7e17b5-4407-4ff0-8645-69cc6ace54f9</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.241</span><br><span class="line">Uuid: e19a56c0-a060-4bcc-80d8-99de3d85a484</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.245</span><br><span class="line">Uuid: ce286cd4-6ca2-48cb-8207-d58a99ff37dc</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.246</span><br><span class="line">Uuid: d4ecc341-7b45-4374-90a5-2f53449c8c86</span><br><span class="line">State: Peer in Cluster (Connected)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看卷信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">gluster volume info</span><br><span class="line"></span><br><span class="line">Volume Name: gv0</span><br><span class="line">Type: Distributed-Replicate</span><br><span class="line">Volume ID: 8377a30e-6f6e-4dfc-9378-f56c1b3559e1</span><br><span class="line">Status: Started</span><br><span class="line">Number of Bricks: 2 x 2 = 4</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: 172.16.18.241:/export/brick1/gv0</span><br><span class="line">Brick2: 172.16.18.242:/export/brick1/gv0</span><br><span class="line">Brick3: 172.16.18.243:/export/brick1/gv0</span><br><span class="line">Brick4: 172.16.18.244:/export/brick1/gv0</span><br><span class="line">Options Reconfigured:</span><br><span class="line">diagnostics.count-fop-hits: on</span><br><span class="line">diagnostics.latency-measurement: on</span><br><span class="line">performance.readdir-ahead: on</span><br></pre></td></tr></table></figure>
+<ul>
+<li>添加brick</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"> gluster volume add-brick gv0 172.16.18.245:/export/brick1/gv0 172.16.18.246:/export/brick1/gv0  </span><br><span class="line">volume add-brick: success</span><br></pre></td></tr></table></figure>
+<ul>
+<li>验证Brick添加</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">gluster volume info  </span><br><span class="line"></span><br><span class="line">Volume Name: gv0</span><br><span class="line">Type: Distributed-Replicate</span><br><span class="line">Volume ID: 8377a30e-6f6e-4dfc-9378-f56c1b3559e1</span><br><span class="line">Status: Started</span><br><span class="line">Number of Bricks: 3 x 2 = 6</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: 172.16.18.241:/export/brick1/gv0</span><br><span class="line">Brick2: 172.16.18.242:/export/brick1/gv0</span><br><span class="line">Brick3: 172.16.18.243:/export/brick1/gv0</span><br><span class="line">Brick4: 172.16.18.244:/export/brick1/gv0</span><br><span class="line">Brick5: 172.16.18.245:/export/brick1/gv0</span><br><span class="line">Brick6: 172.16.18.246:/export/brick1/gv0</span><br><span class="line">Options Reconfigured:</span><br><span class="line">diagnostics.count-fop-hits: on</span><br><span class="line">diagnostics.latency-measurement: on</span><br><span class="line">performance.readdir-ahead: on</span><br></pre></td></tr></table></figure>
+<ul>
+<li>重新分配数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">gluster volume rebalance gv0 start</span><br><span class="line">volume rebalance: gv0: success: Rebalance on gv0 has been started successfully. Use rebalance status command to check status of the rebalance process.</span><br><span class="line">ID: 0d7c4099-cde7-4a37-9d3e-2a9ae83e6843</span><br><span class="line">gluster volume rebalance gv0 status</span><br><span class="line">                                    Node Rebalanced-files          size       scanned      failures       skipped               status   run time in secs</span><br><span class="line">                               ---------      -----------   -----------   -----------   -----------   -----------         ------------     --------------</span><br><span class="line">                               localhost                0        0Bytes             0             0             0            completed               0.00</span><br><span class="line">                           172.16.18.242                0        0Bytes             0             0             0            completed               0.00</span><br><span class="line">                           172.16.18.243                0        0Bytes             4             0             0            completed               0.00</span><br><span class="line">                           172.16.18.241                0        0Bytes             4             0             1            completed               0.00</span><br><span class="line">                           172.16.18.245                0        0Bytes             1             0             0            completed               0.00</span><br><span class="line">                           172.16.18.246                0        0Bytes             0             0             0            completed               0.00</span><br><span class="line">volume rebalance: gv0: success:</span><br></pre></td></tr></table></figure>
+<p>在线缩减</p>
+<ul>
+<li>移除Brick</li>
+</ul>
+<p>若是副本卷，则要溢出的Brick是replica的整数倍，stripe具有同样的要求，一次副本卷要移除一对Brick，数据会移到其他节点。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">gluster volume remove-brick gv0 172.16.18.245:/export/brick1/gv0  172.16.18.246:/export/brick1/gv0 start</span><br><span class="line">volume remove-brick start: success</span><br><span class="line">ID: b3600ab0-b103-405a-8458-4edb820c0ca1</span><br><span class="line"> gluster volume status</span><br><span class="line">Status of volume: gv0</span><br><span class="line">Gluster process                             TCP Port  RDMA Port  Online  Pid</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Brick 172.16.18.241:/export/brick1/gv0      49152     0          Y       1970</span><br><span class="line">Brick 172.16.18.242:/export/brick1/gv0      49152     0          Y       9547</span><br><span class="line">Brick 172.16.18.243:/export/brick1/gv0      49152     0          Y       9558</span><br><span class="line">Brick 172.16.18.244:/export/brick1/gv0      49152     0          Y       9741</span><br><span class="line">Brick 172.16.18.245:/export/brick1/gv0      49152     0          Y       13266</span><br><span class="line">Brick 172.16.18.246:/export/brick1/gv0      49152     0          Y       12484</span><br><span class="line">NFS Server on localhost                     N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on localhost               N/A       N/A        Y       15073</span><br><span class="line">NFS Server on 172.16.18.243                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.243           N/A       N/A        Y       13755</span><br><span class="line">NFS Server on 172.16.18.242                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.242           N/A       N/A        Y       1424</span><br><span class="line">NFS Server on 172.16.18.241                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.241           N/A       N/A        Y       2124</span><br><span class="line">NFS Server on 172.16.18.246                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.246           N/A       N/A        Y       12511</span><br><span class="line">NFS Server on 172.16.18.245                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.245           N/A       N/A        Y       13293</span><br><span class="line"></span><br><span class="line">Task Status of Volume gv0</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Task                 : Remove brick        </span><br><span class="line">ID                   : b3600ab0-b103-405a-8458-4edb820c0ca1</span><br><span class="line">Removed bricks:     </span><br><span class="line">172.16.18.245:/export/brick1/gv0</span><br><span class="line">172.16.18.246:/export/brick1/gv0</span><br><span class="line">Status               : completed</span><br><span class="line">gluster volume remove-brick gv0 172.16.18.245:/export/brick1/gv0  172.16.18.246:/export/brick1/gv0  status</span><br><span class="line">                                    Node Rebalanced-files          size       scanned      failures       skipped               status   run time in secs</span><br><span class="line">                               ---------      -----------   -----------   -----------   -----------   -----------         ------------     --------------</span><br><span class="line">                           172.16.18.245                1       42Bytes             1             0             0            completed               1.00</span><br><span class="line">                           172.16.18.246                0        0Bytes             0             0             0            completed               0.00</span><br><span class="line"></span><br><span class="line">gluster volume remove-brick gv0 172.16.18.245:/export/brick1/gv0  172.16.18.246:/export/brick1/gv0 commit</span><br><span class="line">Removing brick(s) can result in data loss. Do you want to Continue? (y/n) y</span><br><span class="line">volume remove-brick commit: success</span><br><span class="line">Check the removed bricks to ensure all files are migrated.</span><br><span class="line">If files with data are found on the brick path, copy them via a gluster mount point before re-purposing the removed brick.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>移除节点</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">gluster peer detach 172.16.18.245</span><br><span class="line">peer detach: success</span><br><span class="line">gluster peer detach 172.16.18.246</span><br><span class="line">peer detach: success</span><br><span class="line"> gluster volume status            </span><br><span class="line">Status of volume: gv0</span><br><span class="line">Gluster process                             TCP Port  RDMA Port  Online  Pid</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Brick 172.16.18.241:/export/brick1/gv0      49152     0          Y       1970</span><br><span class="line">Brick 172.16.18.242:/export/brick1/gv0      49152     0          Y       9547</span><br><span class="line">Brick 172.16.18.243:/export/brick1/gv0      49152     0          Y       9558</span><br><span class="line">Brick 172.16.18.244:/export/brick1/gv0      49152     0          Y       9741</span><br><span class="line">NFS Server on localhost                     N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on localhost               N/A       N/A        Y       15386</span><br><span class="line">NFS Server on 172.16.18.241                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.241           N/A       N/A        Y       2605</span><br><span class="line">NFS Server on 172.16.18.242                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.242           N/A       N/A        Y       1966</span><br><span class="line">NFS Server on 172.16.18.243                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.243           N/A       N/A        Y       14272</span><br><span class="line"></span><br><span class="line">Task Status of Volume gv0</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">There are no active volume tasks</span><br></pre></td></tr></table></figure>
+<h3 id="替换某个Brick"><a href="#替换某个Brick" class="headerlink" title="替换某个Brick"></a>替换某个Brick</h3><ul>
+<li>增加一个节点</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gluster peer probe 172.16.18.245</span><br><span class="line">peer probe: success.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将172.16.18.244：/export/brick1/gv0替换为172.16.18.245:/export/brick1/gv0_</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gluster volume replace-brick gv0 172.16.18.244:/export/brick1/gv0  172.16.18.245:/export/brick1/gv0  start force</span><br><span class="line">gluster volume replace-brick gv0 172.16.18.244:/export/brick1/gv0  172.16.18.245:/export/brick1/gv0 commit</span><br></pre></td></tr></table></figure>
+<h3 id="其它操作笔记"><a href="#其它操作笔记" class="headerlink" title="其它操作笔记"></a>其它操作笔记</h3><ul>
+<li>删除GlusterFS卷</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume stop gv0</span><br><span class="line"># gluster volume delete gv0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>ACL访问控制</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume set gv0 auth.allow 172.16.18.*,192.168.1.*</span><br></pre></td></tr></table></figure>
+<ul>
+<li>添加GlusterFS节点及brick</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># gluster peer probe 172.16.18.245</span><br><span class="line"># gluster peer probe 172.16.18.246</span><br><span class="line"># gluster volume add-brick gv0 172.16.18.245:/export/brick1/gv0  172.16.18.246:/export/brick1/gv0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>删除GlusterFS节点</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gluster peer detach 172.16.18.242</span><br></pre></td></tr></table></figure>
+<ul>
+<li>删除GlusterFS brick</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume remove-brick gv0 172.16.18.245:/export/brick1/gv0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>数据重新分配</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gluster volume rebalance gv0 start gluster volume rebalance gv0 status gluster volume rebalance gv0 stop</span><br></pre></td></tr></table></figure>
+<h3 id="性能监控"><a href="#性能监控" class="headerlink" title="性能监控"></a>性能监控</h3><ul>
+<li>profile</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gluster volume profile mamm-vol start&lt;br&gt;</span><br><span class="line">gluster volume profile info&lt;br&gt;</span><br><span class="line">gluster volume profile mamm-vol stop</span><br></pre></td></tr></table></figure>
+<ul>
+<li>top</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gluster volume top mamm-vol &#123;open|read|write|opendir|readdir&#125; brick node1:/exp1 list-cnt 1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>显示当前某个brick或NFS路径读文件或写文件数据的性能 ‘’</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gluster volume top mamm-vol read-perf|write-perf bs 256 count 10 brick node1:/exp1 list-cnt 1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>内部计数导出</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gluster volume statedump mamm-vol</span><br></pre></td></tr></table></figure>
+<ul>
+<li>迁移GlusterFS磁盘数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume remove-brick gv0 172.16.18.241:/export/brick1/gv0 172.16.18.242:/export/brick1/gv0 start</span><br><span class="line"># gluster volume remove-brick gv0 172.16.18.241:/export/brick1/gv0 172.16.18.242:/export/brick1/gv0 pause</span><br><span class="line"># gluster volume remove-brick gv0 172.16.18.241:/export/brick1/gv0 172.16.18.242:/export/brick1/gv0 status</span><br><span class="line"># gluster volume remove-brick gv0 172.16.18.241:/export/brick1/gv0 172.16.18.242:/export/brick1/gv0 commit</span><br><span class="line"># gluster volume remove-brick gv0 172.16.18.241:/export/brick1/gv0 172.16.18.242:/export/brick1/gv0 abort</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修复GlusterFS磁盘数据（例如172.16.18.241宕机的情况下）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># gluster volume replace-brick gv0 172.16.18.241:/export/brick1/gv0 172.16.18.246:/export/brick1/gv0 commit -force</span><br><span class="line"># gluster volume heal gv0</span><br><span class="line"># gluster volume heal gv0 full</span><br><span class="line"># gluster volume heal gv0 info</span><br></pre></td></tr></table></figure>
+<h2 id="GlusterFS常用中继介绍"><a href="#GlusterFS常用中继介绍" class="headerlink" title="GlusterFS常用中继介绍"></a>GlusterFS常用中继介绍</h2><ul>
+<li>storage/posix #指定一个本地目录给GlusterFS内的一个卷使用；</li>
+<li>protocol/server #服务器中继，表示此节点在GlusterFS中为服务器模式，可以说明其IP、守护端口、访问权限；</li>
+<li>protocol/client #客户端中继，用于客户端连接服务器时使用，需要指明服务器IP和定义好的卷；</li>
+<li>cluster/replicate #复制中继，备份文件时使用，若某子卷掉了，系统仍能正常工作，子卷起来后自动更新（通过客户端）；</li>
+<li>cluster/distribute #分布式中继，可以把两个卷或子卷组成一个大卷，实现多存储空间的聚合；</li>
+<li>features/locks #锁中继，只能用于服务器端的posix中继之上，表示给这个卷提供加锁(fcntl locking)的功能；</li>
+<li>performance/read-ahead #预读中继，属于性能调整中继的一种，用预读的方式提高读取的性能，有利于应用频繁持续性的访问文件，当应用完成当前数据块读取的时候，下一个数据块就已经准备好了，主要是在IB-verbs或10G的以太网上使用；</li>
+<li>performance/write-behind #回写中继，属于性能调整中继的一种，作用是在写数据时，先写入缓存内，再写入硬盘，以提高写入的性能，适合用于服务器端；</li>
+<li>performance/io-threads #IO线程中继，属于性能调整中继的一种，由于glusterfs 服务是单线程的，使用IO 线程转换器可以较大的提高性能，这个转换器最好是被用于服务器端；</li>
+<li>erformance/io-cache #IO缓存中继，属于性能调整中继的一种，作用是缓存住已经被读过的数据，以提高IO 性能，当IO 缓存中继检测到有写操作的时候，它就会把相应的文件从缓存中删除，需要设置文件匹配列表及其设置的优先级等内容；</li>
+<li>luster/stripe #条带中继，将单个大文件分成多个小文件存于各个服务器中，实现大文件的分块存储。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/glusterfs/" rel="tag"> <i class="fa fa-tag"></i> glusterfs</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+               <div>
+                 
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+               </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/19/moosefs-guide.html" rel="next" title="MFS使用手册">
+                <i class="fa fa-chevron-left"></i> MFS使用手册
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/19/glusterfs.html" rel="prev" title="GlusterFS技术详解">
+                GlusterFS技术详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjY0MS8xOTE4OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/blog/avatar.jpg" alt="Cc">
+            
+              <p class="site-author-name" itemprop="name">Cc</p>
+              <p class="site-description motion-element" itemprop="description">Love Linux ♥ Love Python. 猴赛雷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#环境介绍"><span class="nav-number">1.</span> <span class="nav-text">环境介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装GlusterFS软件包"><span class="nav-number">1.1.</span> <span class="nav-text">安装GlusterFS软件包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置整个GlusterFS集群"><span class="nav-number">1.2.</span> <span class="nav-text">配置整个GlusterFS集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建数据存放目录"><span class="nav-number">1.3.</span> <span class="nav-text">创建数据存放目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GlusterFS磁盘"><span class="nav-number">1.4.</span> <span class="nav-text">GlusterFS磁盘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装客户端并mount-GlusterFS文件系统"><span class="nav-number">1.5.</span> <span class="nav-text">安装客户端并mount GlusterFS文件系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读写可用性测试"><span class="nav-number">1.6.</span> <span class="nav-text">读写可用性测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩容与缩减"><span class="nav-number">1.7.</span> <span class="nav-text">扩容与缩减</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在线扩容"><span class="nav-number">1.7.1.</span> <span class="nav-text">在线扩容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#替换某个Brick"><span class="nav-number">1.7.2.</span> <span class="nav-text">替换某个Brick</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其它操作笔记"><span class="nav-number">1.7.3.</span> <span class="nav-text">其它操作笔记</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能监控"><span class="nav-number">1.7.4.</span> <span class="nav-text">性能监控</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GlusterFS常用中继介绍"><span class="nav-number">1.8.</span> <span class="nav-text">GlusterFS常用中继介绍</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cc</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2017/12/19/install-glusterfs.html'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
+</body>
+</html>

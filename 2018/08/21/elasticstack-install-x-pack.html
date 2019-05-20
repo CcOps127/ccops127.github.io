@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在前面几篇介绍了 elasticstack的各个组件的安装部署，但是如何保证各个组件之间信息传输的可靠性呢，x-pack便应运而生。 x-pack介绍x-pack是elasticstack的扩展插件，将安全、报警、监视、报告和图形功能包含在一个易于安装的软件包中。通过这个插件可以监控到各个组件的运行状态，可以第一时间获取到安全信息。  x-pack 安装 上图是整个x-pack的安装过程。">
+<meta name="keywords" content="elasticstack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源日志系统ElasticStack搭建-x-pack篇">
+<meta property="og:url" content="https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html">
+<meta property="og:site_name" content="Cc&#39;s Blog">
+<meta property="og:description" content="在前面几篇介绍了 elasticstack的各个组件的安装部署，但是如何保证各个组件之间信息传输的可靠性呢，x-pack便应运而生。 x-pack介绍x-pack是elasticstack的扩展插件，将安全、报警、监视、报告和图形功能包含在一个易于安装的软件包中。通过这个插件可以监控到各个组件的运行状态，可以第一时间获取到安全信息。  x-pack 安装 上图是整个x-pack的安装过程。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.oneops.co/images/elk/x-pack-monitor.png">
+<meta property="og:image" content="https://www.oneops.co/images/elk/x-pack_InstallationFlow.jpg">
+<meta property="og:image" content="https://www.oneops.co/images/elk/x-pack-es-monitor.png">
+<meta property="og:image" content="https://www.oneops.co/images/elk/x-pack-es-monitor.png">
+<meta property="og:image" content="https://www.oneops.co/images/elk/x-pack-logstash_writer_role.png">
+<meta property="og:image" content="https://www.oneops.co/images/elk/x-pack-logstash-monitor.png">
+<meta property="og:image" content="https://www.oneops.co/images/elk/x-pack_beats_role.png">
+<meta property="og:image" content="https://www.oneops.co/images/elk/x-pack-filebeat-monitor.png">
+<meta property="og:updated_time" content="2019-05-20T06:57:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开源日志系统ElasticStack搭建-x-pack篇">
+<meta name="twitter:description" content="在前面几篇介绍了 elasticstack的各个组件的安装部署，但是如何保证各个组件之间信息传输的可靠性呢，x-pack便应运而生。 x-pack介绍x-pack是elasticstack的扩展插件，将安全、报警、监视、报告和图形功能包含在一个易于安装的软件包中。通过这个插件可以监控到各个组件的运行状态，可以第一时间获取到安全信息。  x-pack 安装 上图是整个x-pack的安装过程。">
+<meta name="twitter:image" content="https://www.oneops.co/images/elk/x-pack-monitor.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>开源日志系统ElasticStack搭建-x-pack篇 | Cc's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=71693959-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '71693959-4');
+</script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Cc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">生命不止 学习不息</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">开源日志系统ElasticStack搭建-x-pack篇
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-08-21 18:14:30" itemprop="dateCreated datePublished" datetime="2018-08-21T18:14:30+08:00">2018-08-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-05-20 14:57:35" itemprop="dateModified" datetime="2019-05-20T14:57:35+08:00">2019-05-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在前面几篇介绍了 <code>elasticstack</code>的各个组件的安装部署，但是如何保证各个组件之间信息传输的可靠性呢，<code>x-pack</code>便应运而生。</p>
+<h1 id="x-pack介绍"><a href="#x-pack介绍" class="headerlink" title="x-pack介绍"></a>x-pack介绍</h1><p><code>x-pack</code>是<code>elasticstack</code>的扩展插件，将安全、报警、监视、报告和图形功能包含在一个易于安装的软件包中。通过这个插件可以监控到各个组件的运行状态，可以第一时间获取到安全信息。 <img src="https://www.oneops.co/images/elk/x-pack-monitor.png" alt></p>
+<h1 id="x-pack-安装"><a href="#x-pack-安装" class="headerlink" title="x-pack 安装"></a>x-pack 安装</h1><p><img src="https://www.oneops.co/images/elk/x-pack_InstallationFlow.jpg" alt> 上图是整个x-pack的安装过程。</p>
+<a id="more"></a>
+<h2 id="elasticsearch-安装及破解-x-pack"><a href="#elasticsearch-安装及破解-x-pack" class="headerlink" title="elasticsearch 安装及破解 x-pack"></a>elasticsearch 安装及破解 x-pack</h2><h3 id="正常安装-x-pack"><a href="#正常安装-x-pack" class="headerlink" title="正常安装 x-pack"></a>正常安装 x-pack</h3><ul>
+<li>下载x-pack软件包</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /data/elastic/packages</span><br><span class="line">wget https://artifacts.elastic.co/downloads/packs/x-pack/x-pack-6.2.4.zip</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装 x-pack</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/data/elastic/elasticsearch/bin/elasticsearch-plugin install file:///data/elastic/packages/x-pack-6.2.4.zip</span><br><span class="line"></span><br><span class="line">//需要同意下协议 回车 输入y 回车 会提示安装成功</span><br></pre></td></tr></table></figure>
+<h3 id="破解-x-pack"><a href="#破解-x-pack" class="headerlink" title="破解 x-pack"></a>破解 x-pack</h3><ul>
+<li>创建临时目录，拷贝代码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir tmp</span><br><span class="line">cp elasticsearch/plugins/x-pack/x-pack-core/x-pack-core-6.2.4.jar tmp/</span><br><span class="line">cd tmp</span><br><span class="line">/usr/lib/jvm/bin/jar -xf x-pack-core-6.2.4.jar</span><br></pre></td></tr></table></figure>
+<ul>
+<li>破解文件（2个文件）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#第一个</span><br><span class="line">org/elasticsearch/license/LicenseVerifier.class</span><br><span class="line">#第二个</span><br><span class="line">org/elasticsearch/xpack/core/XPackBuild.class</span><br></pre></td></tr></table></figure>
+<ul>
+<li>下载反编译软件（luyten）</li>
+</ul>
+<p><a href="https://github.com/deathmarine/Luyten/releases/tag/v0.5.0" target="_blank" rel="noopener">luyten点这里下载</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">使用luyten分别打开</span><br><span class="line">org/elasticsearch/license/LicenseVerifier.class</span><br><span class="line">org/elasticsearch/xpack/core/XPackBuild.class</span><br><span class="line">两个文件后另存为LicenseVerifier.java和XPackBuild.java</span><br><span class="line"></span><br><span class="line">请勿修改文件名称。然后使用notepad++打开。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>破解 LicenseVerifier.class</li>
+</ul>
+<p>清空保存后的 <code>LicenseVerifier.java</code>文件内容，复制以下内容然后保存</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">package org.elasticsearch.license;</span><br><span class="line"></span><br><span class="line">import java.nio.*;</span><br><span class="line">import java.util.*;</span><br><span class="line">import java.security.*;</span><br><span class="line">import org.elasticsearch.common.xcontent.*;</span><br><span class="line">import org.apache.lucene.util.*;</span><br><span class="line">import org.elasticsearch.common.io.*;</span><br><span class="line">import java.io.*;</span><br><span class="line"></span><br><span class="line">public class LicenseVerifier</span><br><span class="line">&#123;</span><br><span class="line">    public static boolean verifyLicense(final License license, final byte[] encryptedPublicKeyData) &#123;</span><br><span class="line">　　　　return true;</span><br><span class="line">　　&#125;</span><br><span class="line">　　public static boolean verifyLicense(final License license) &#123;</span><br><span class="line">　　　　return true;</span><br><span class="line">　　&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>破解XPackBuild.class</li>
+</ul>
+<p>清空<code>XPackBuild.java</code>文件中的内容，然后复制以下的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">package org.elasticsearch.xpack.core;</span><br><span class="line"></span><br><span class="line">import org.elasticsearch.common.io.*;</span><br><span class="line">import java.net.*;</span><br><span class="line">import org.elasticsearch.common.*;</span><br><span class="line">import java.nio.file.*;</span><br><span class="line">import java.io.*;</span><br><span class="line">import java.util.jar.*;</span><br><span class="line"></span><br><span class="line">public class XPackBuild</span><br><span class="line">&#123;</span><br><span class="line">    public static final XPackBuild CURRENT;</span><br><span class="line">    private String shortHash;</span><br><span class="line">    private String date;</span><br><span class="line"></span><br><span class="line">    @SuppressForbidden(reason = &quot;looks up path of xpack.jar directly&quot;)</span><br><span class="line">    static Path getElasticsearchCodebase() &#123;</span><br><span class="line">        final URL url = XPackBuild.class.getProtectionDomain().getCodeSource().getLocation();</span><br><span class="line">        try &#123;</span><br><span class="line">            return PathUtils.get(url.toURI());</span><br><span class="line">        &#125;</span><br><span class="line">        catch (URISyntaxException bogus) &#123;</span><br><span class="line">            throw new RuntimeException(bogus);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    XPackBuild(final String shortHash, final String date) &#123;</span><br><span class="line">        this.shortHash = shortHash;</span><br><span class="line">        this.date = date;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String shortHash() &#123;</span><br><span class="line">        return this.shortHash;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String date() &#123;</span><br><span class="line">        return this.date;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        final Path path = getElasticsearchCodebase();</span><br><span class="line">        String shortHash = null;</span><br><span class="line">        String date = null;</span><br><span class="line">        Label_0157: &#123;</span><br><span class="line">            shortHash = &quot;Unknown&quot;;</span><br><span class="line">            date = &quot;Unknown&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        CURRENT = new XPackBuild(shortHash, date);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>重新破解编译文件</li>
+</ul>
+<p>上传<code>LicenseVerifier.java</code>，<code>XPackBuild.java</code> 到服务器上，也可以根据自己的环境来操作，以下命令运行完后，会在tmp/下生成<code>LicenseVerifier.class</code> 和<code>XPackBuild.class</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/jvm/bin/javac -cp &quot;/data/elastic/elasticsearch/lib/elasticsearch-6.2.4.jar:/data/elastic/elasticsearch/lib/lucene-core-7.2.1.jar:/data/elastic/elasticsearch/plugins/x-pack/x-pack-core/x-pack-core-6.2.4.jar:/data/elastic/elasticsearch/lib/elasticsearch-core-6.2.4.jar&quot; tmp/XPackBuild.java</span><br><span class="line"></span><br><span class="line">/usr/lib/jvm/bin/javac -cp &quot;/data/elastic/elasticsearch/lib/elasticsearch-6.2.4.jar:/data/elastic/elasticsearch/lib/lucene-core-7.2.1.jar::/data/elastic/elasticsearch/plugins/x-pack/x-pack-core/x-pack-core-6.2.4.jar&quot; tmp/LicenseVerifier.java</span><br></pre></td></tr></table></figure>
+<p>把重新编译的<code>LicenseVerifier.class</code> 和<code>XPackBuild.class</code>复制到原来位置，覆盖原文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp ../LicenseVerifier.class org/elasticsearch/license/LicenseVerifier.class</span><br><span class="line">cp ../XPackBuild.class org/elasticsearch/xpack/core/XPackBuild.class</span><br></pre></td></tr></table></figure>
+<ul>
+<li>重新打包</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd tmp/x-pack</span><br><span class="line">/usr/lib/jvm/bin/jar -cf ../x-pack-core-6.2.4.jar .</span><br><span class="line"></span><br><span class="line">// 把重新打包的 `x-pack-core-6.2.4.jar` 覆盖elasticsearch/plugins/x-pack/x-pack-core/下的文件</span><br><span class="line">cp tmp/x-pack-core-6.2.4.jar elasticsearch/plugins/x-pack/x-pack-core/</span><br></pre></td></tr></table></figure>
+<h3 id="重置密码"><a href="#重置密码" class="headerlink" title="重置密码"></a>重置密码</h3><p>初次安装<code>x-pack</code>后，需要重置默认的密码，在 <code>elasticsearch 6.x</code>之后，使用<code>bin/x-pack/setup-passwords auto</code>来自动生成密码，也可以通过<code>bin/x-pack/setup-passwords interactive</code> 来制定密码生成</p>
+<ul>
+<li><code>elastic</code>: <code>elastic-som</code></li>
+<li><code>kibana</code>: <code>kibana-som</code></li>
+<li><code>logstash_system</code>: <code>logstash-som</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">elasticsearch/bin/x-pack/setup-passwords interactive</span><br></pre></td></tr></table></figure>
+<h3 id="配置-SSL-认证"><a href="#配置-SSL-认证" class="headerlink" title="配置 SSL 认证"></a>配置 SSL 认证</h3><p>从 <code>elasticsearch 6.x</code>版本开始，在更新 <code>x-pack</code>的证书为黄金版以上，原有的用户管理功能就必须使用 <code>SSL</code> 加密的通信机制方可使用。不然在导入及查看 <code>license</code>的时候就会报错。</p>
+<ul>
+<li>生成节点证书</li>
+</ul>
+<p>编辑文件 instances.yml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cat instances.yml</span><br><span class="line">instances:</span><br><span class="line">  - name: &quot;ali-sh-d-elk-es-59&quot;</span><br><span class="line">    ip:</span><br><span class="line">      - &quot;172.16.31.59&quot;</span><br><span class="line">  - name: &quot;ali-sh-d-elk-es-60&quot;</span><br><span class="line">    ip:</span><br><span class="line">      - &quot;172.16.31.60&quot;</span><br><span class="line">  - name: &quot;ali-sh-d-elk-es-61&quot;</span><br><span class="line">    ip:</span><br><span class="line">      - &quot;172.16.31.61&quot;</span><br><span class="line">  - name: &quot;ali-sh-d-elk-nginx-62&quot;</span><br><span class="line">    ip:</span><br><span class="line">      - &quot;172.16.31.62&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>生成证书文件</li>
+</ul>
+<p>使用命令 <code>bin/x-pack/certgen -in instances.yml</code> ，这样会在当前目录下生成一个 certificate-bundle.zip 证书压缩文件，里面包含4个节点的证书和ca证书。也已通过运行bin/x-pack/certgen 来手动填写各个节点的信息并申请证书。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/data/elastic/elasticsearch/bin/x-pack/certgen -in instances.yml</span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置证书</li>
+</ul>
+<p>将各个节点的证书上传到相应节点上，并在 <code>elasticsearch.yml</code>中添加下列内容，<code>/data/elastic/elasticsearch/config/ssl/</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">cluster.name: ali-sh-elastic</span><br><span class="line">node.master: true</span><br><span class="line">node.name: node-60</span><br><span class="line">path.data: /data/elastic/elastic-data</span><br><span class="line">path.logs: /data/elastic/elastic-logs</span><br><span class="line">bootstrap.memory_lock: true</span><br><span class="line">bootstrap.system_call_filter: false</span><br><span class="line">network.host: 172.16.31.60</span><br><span class="line">http.port: 9200</span><br><span class="line">discovery.zen.ping.unicast.hosts: [&quot;172.16.31.59&quot;, &quot;172.16.31.60&quot;]</span><br><span class="line">discovery.zen.minimum_master_nodes: 2</span><br><span class="line">http.cors.enabled: true</span><br><span class="line">http.cors.allow-origin: &quot;*&quot;</span><br><span class="line">http.cors.allow-headers: Authorization,X-Requested-With,Content-Length,Content-Type</span><br><span class="line">xpack.security.http.ssl.enabled: true</span><br><span class="line">xpack.ssl.key: /data/elastic/elasticsearch/config/ssl/ali-sh-d-elk-es-60/ali-sh-d-elk-es-60.key</span><br><span class="line">xpack.ssl.certificate: /data/elastic/elasticsearch/config/ssl/ali-sh-d-elk-es-60/ali-sh-d-elk-es-60.crt</span><br><span class="line">xpack.ssl.certificate_authorities:  /data/elastic/elasticsearch/config/ssl/ca/ca.crt</span><br><span class="line">xpack.security.transport.ssl.enabled: true</span><br><span class="line">xpack.security.transport.ssl.verification_mode: certificate</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改 java 配置</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 配置完成后，启动 elasticsearch 会报java.security.AccessControlException: access denied (&quot;java.io.FilePermission&quot; &quot;/data/elastic/elasticsearch/config/ssl/ca/ca.crt&quot; &quot;read&quot;)</span><br><span class="line">// 编辑 /usr/lib/jvm/jre/lib/security/java.policy 在grant中添加以下内容</span><br><span class="line"></span><br><span class="line">grant &#123;</span><br><span class="line">      ...内容省略 ...</span><br><span class="line"></span><br><span class="line">        permission java.io.FilePermission &quot;&lt;&lt;ALL FILES&gt;&gt;&quot;, &quot;read&quot;;</span><br><span class="line">       #添加此行</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="导入授权"><a href="#导入授权" class="headerlink" title="导入授权"></a>导入授权</h3><ul>
+<li>修改配置</li>
+</ul>
+<p><code>elasticsearch 6.2.4</code> 中默认开启了安全验证，我们暂时修改配置文件以方便导入自己的文件,在<code>elasticsearch.yml</code> 中 添加一下配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xpack.security.enabled:false</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>重启集群</p>
+</li>
+<li><p>修改授权文件 Licence</p>
+</li>
+</ul>
+<p>将过期时间修改为<code>2050</code>,<code>type</code>改为<code>platinum</code>白金版，这样就拥有了 <code>x-pack</code>的全部功能</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;license&quot;: &#123;</span><br><span class="line">        &quot;uid&quot;: &quot;53bb4e19-c87a-461a-a9f5-b76bc448a255&quot;,</span><br><span class="line">        &quot;type&quot;: &quot;platinum&quot;,</span><br><span class="line">        &quot;issue_date_in_millis&quot;: 1497571200000,</span><br><span class="line">        &quot;expiry_date_in_millis&quot;: 2524579200999,</span><br><span class="line">        &quot;max_nodes&quot;: 100,</span><br><span class="line">        &quot;issued_to&quot;: &quot;len blank (linekong)&quot;,</span><br><span class="line">        &quot;issuer&quot;: &quot;Web Form&quot;,</span><br><span class="line">        &quot;signature&quot;: &quot;AAAAAwAAAA2osqnvGUSaUHjvr89PAAABmC9ZN0hjZDBGYnVyRXpCOW5Bb3FjZDAxOWpSbTVoMVZwUzRxVk1PSmkxaktJRVl5MUYvUWh3bHZVUTllbXNPbzBUemtnbWpBbmlWRmRZb25KNFlBR2x0TXc2K2p1Y1VtMG1UQU9TRGZVSGRwaEJGUjE3bXd3LzRqZ05iLzRteWFNekdxRGpIYlFwYkJiNUs0U1hTVlJKNVlXekMrSlVUdFIvV0FNeWdOYnlESDc3MWhlY3hSQmdKSjJ2ZTcvYlBFOHhPQlV3ZHdDQ0tHcG5uOElCaDJ4K1hob29xSG85N0kvTWV3THhlQk9NL01VMFRjNDZpZEVXeUtUMXIyMlIveFpJUkk2WUdveEZaME9XWitGUi9WNTZVQW1FMG1DenhZU0ZmeXlZakVEMjZFT2NvOWxpZGlqVmlHNC8rWVVUYzMwRGVySHpIdURzKzFiRDl4TmM1TUp2VTBOUlJZUlAyV0ZVL2kvVk10L0NsbXNFYVZwT3NSU082dFNNa2prQ0ZsclZ4NTltbU1CVE5lR09Bck93V2J1Y3c9PQAAAQAzBsXB22RFJXVDaGfXKn+nNX0gpK0PehtCvH6spBPtTzK4QFHHM8wGE7k6PZheY2Z9AUXPnnT3BaF7mLey0hJuLLg+wdghLKqGj1hudaCx6gAl4plIFwJsUWUZ6AwGoUI5wVkUuT9auYAfLmmts26INO983Z4NmaPXhoSfWpyhqKTL7j3WDaYzSJXN/MT9EU8jfUn/hZc7RqXl1Lgh4tV98NTXS+zUvcqEz8O4EiZvZhe6b73c3no/M+D8DDmJTcfiR2fufxo0fRRwd1eMNAoVAef+XTqmKZQ890Battqh7T5l2PAoTNtVhW6Zc9l/GaKmHbD8P18uDlFCFLxjZ4yw&quot;,</span><br><span class="line">        &quot;start_date_in_millis&quot;: 1497571200000</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>导入 license</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -k -XPUT -u elastic:elastic-som &apos;https://172.16.31.59:9200/_xpack/license&apos; -H &quot;Content-Type: application/json&quot; -d @license.json</span><br><span class="line">&#123;</span><br><span class="line">    &quot;acknowledged&quot;: true,</span><br><span class="line">    &quot;license_status&quot;: &quot;valid&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="监控展示"><a href="#监控展示" class="headerlink" title="监控展示"></a>监控展示</h3><p><img src="https://www.oneops.co/images/elk/x-pack-es-monitor.png" alt></p>
+<h2 id="kibana安装-x-pack"><a href="#kibana安装-x-pack" class="headerlink" title="kibana安装 x-pack"></a>kibana安装 x-pack</h2><h3 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kibana/bin/kibana-plugin install x-pack</span><br></pre></td></tr></table></figure>
+<h3 id="增加SSL认证"><a href="#增加SSL认证" class="headerlink" title="增加SSL认证"></a>增加SSL认证</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">server.port: 5601</span><br><span class="line">server.host: &quot;172.16.31.60&quot;</span><br><span class="line">elasticsearch.url: &quot;https://172.16.31.60:9200&quot;</span><br><span class="line">kibana.index: &quot;.kibana&quot;</span><br><span class="line">elasticsearch.username: &quot;kibana&quot;</span><br><span class="line">elasticsearch.password: &quot;kibana-som&quot;</span><br><span class="line">server.ssl.enabled: true</span><br><span class="line">server.ssl.certificate: /data/elastic/elasticsearch/config/ssl/ali-sh-d-elk-es-60/ali-sh-d-elk-es-60.crt</span><br><span class="line">server.ssl.key: /data/elastic/elasticsearch/config/ssl/ali-sh-d-elk-es-60/ali-sh-d-elk-es-60.key</span><br><span class="line">elasticsearch.ssl.certificateAuthorities: [ &quot;/data/elastic/elasticsearch/config/ssl/ca/ca.crt&quot; ]</span><br><span class="line">pid.file: /data/elastic/kibana/kibana.pid</span><br><span class="line">xpack.security.encryptionKey: &quot;4dc86d1257c9ed8d352848ae5bdeaf27&quot;</span><br><span class="line">xpack.reporting.encryptionKey: &quot;4dc86d1257c9ed8d352848ae5bdeaf27&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="启动-kibana"><a href="#启动-kibana" class="headerlink" title="启动 kibana"></a>启动 kibana</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/data/elastic/kibana/bin/kibana -l /data/elastic/kibana/var/kibana.log &amp;</span><br></pre></td></tr></table></figure>
+<h3 id="监控展示-1"><a href="#监控展示-1" class="headerlink" title="监控展示"></a>监控展示</h3><p><img src="https://www.oneops.co/images/elk/x-pack-es-monitor.png" alt></p>
+<h2 id="logstash-安装-x-pack"><a href="#logstash-安装-x-pack" class="headerlink" title="logstash 安装 x-pack"></a>logstash 安装 x-pack</h2><h3 id="安装插件-1"><a href="#安装插件-1" class="headerlink" title="安装插件"></a>安装插件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/data/elastic/logstash/bin/logstash-plugin install x-pack</span><br></pre></td></tr></table></figure>
+<h3 id="增加SSL认证-1"><a href="#增加SSL认证-1" class="headerlink" title="增加SSL认证"></a>增加SSL认证</h3><ul>
+<li>生成 pkcs8 格式的密钥</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl pkcs8 -in ali-sh-d-elk-nginx-62/ali-sh-d-elk-nginx-62.key -topk8 -nocrypt -out ./logstash.pkcs8.key</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建logstash 写用户 创建 <code>logstash_writer_role</code> 角色，权限为</li>
+</ul>
+<p><img src="https://www.oneops.co/images/elk/x-pack-logstash_writer_role.png" alt></p>
+<h3 id="配置变更"><a href="#配置变更" class="headerlink" title="配置变更"></a>配置变更</h3><ul>
+<li>主配置文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">path.data: /data/elastic/logstash-data</span><br><span class="line">pipeline.workers: 4</span><br><span class="line">config.reload.automatic: true</span><br><span class="line">config.reload.interval: 3s</span><br><span class="line">http.host: &quot;172.16.31.62&quot;</span><br><span class="line">log.level: info</span><br><span class="line">path.logs: /data/elastic/logstash-logs</span><br><span class="line">xpack.monitoring.enabled: true</span><br><span class="line">xpack.monitoring.elasticsearch.url: [ &quot;https://172.16.31.59:9200&quot;, &quot;https://172.16.31.60:9200&quot;, &quot;https://172.16.31.61:9200&quot; ]</span><br><span class="line">xpack.monitoring.elasticsearch.username: &quot;logstash_system&quot;</span><br><span class="line">xpack.monitoring.elasticsearch.password: &quot;logstash-som&quot;</span><br><span class="line">xpack.monitoring.elasticsearch.ssl.ca: /data/elastic/logstash/config/ssl/ca/ca.crt</span><br></pre></td></tr></table></figure>
+<ul>
+<li>日志配置</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">more input.conf output.conf</span><br><span class="line">::::::::::::::</span><br><span class="line">input.conf</span><br><span class="line">::::::::::::::</span><br><span class="line">input &#123;</span><br><span class="line">    beats &#123;</span><br><span class="line">        host =&gt; &quot;0.0.0.0&quot;</span><br><span class="line">        port =&gt; 5044</span><br><span class="line">        ssl =&gt; true</span><br><span class="line">        ssl_key =&gt; &quot;/data/elastic/logstash/config/ssl/logstash.pkcs8.key&quot;</span><br><span class="line">        ssl_certificate =&gt; &quot;/data/elastic/logstash/config/ssl/ali-sh-d-elk-nginx-62/ali-sh-d-elk-nginx-62.crt&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">::::::::::::::</span><br><span class="line">output.conf</span><br><span class="line">::::::::::::::</span><br><span class="line">output&#123;  </span><br><span class="line">  elasticsearch&#123;  </span><br><span class="line">    hosts=&gt;[&quot;https://172.16.31.59:9200&quot;,&quot;https://172.16.31.60:9200&quot;,&quot;https://172.16.31.61:9200&quot;]  </span><br><span class="line">    index=&gt;&quot;%&#123;[fields][Service]&#125;-%&#123;+YYYY.MM.dd&#125;&quot;</span><br><span class="line">    user =&gt; &quot;logstash_writer&quot;</span><br><span class="line">    password =&gt; &quot;logstash_writer_password&quot;  </span><br><span class="line">    cacert =&gt; &quot;/data/elastic/logstash/config/ssl/ca/ca.crt&quot;</span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">  file &#123;</span><br><span class="line">    path =&gt; &quot;/data/elastic/logstash-logs/filebeat-%&#123;[fields][Service]&#125;-%&#123;+YYYY-MM-dd&#125;.log&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="监控展示-2"><a href="#监控展示-2" class="headerlink" title="监控展示"></a>监控展示</h3><p><img src="https://www.oneops.co/images/elk/x-pack-logstash-monitor.png" alt></p>
+<h2 id="filebeat-通过SSL-传输数据"><a href="#filebeat-通过SSL-传输数据" class="headerlink" title="filebeat 通过SSL 传输数据"></a>filebeat 通过SSL 传输数据</h2><h3 id="配置证书"><a href="#配置证书" class="headerlink" title="配置证书"></a>配置证书</h3><ul>
+<li>filebeat.yml</li>
+</ul>
+<p>添加新的 <code>kibana,logstash,beat</code> 节点都可以参考此步骤</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">instances:</span><br><span class="line">  - name: &apos;ali-sh-d-serverlist-54&apos;</span><br><span class="line">    ip: [&apos;172.16.31.54&apos;]</span><br><span class="line">  - name: &apos;ali-sh-d-serverlist-55&apos;</span><br><span class="line">    ip: [&apos;172.16.31.55&apos;]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>生成密钥(es上执行)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/data/elastic/elasticsearch/bin/x-pack/certgen --days 3650 --cert ./ca/ca.crt --key ./ca/ca.key --pass --in filebeat.yml --out filebeat-certs.zip</span><br></pre></td></tr></table></figure>
+<ul>
+<li>拷贝证书到 filebeat 服务器</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r filebeat-certs.zip ca 172.16.31.54:/etc/filebeat/ssl/</span><br></pre></td></tr></table></figure>
+<h3 id="配置-filebeat"><a href="#配置-filebeat" class="headerlink" title="配置 filebeat"></a>配置 filebeat</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">filebeat.inputs:</span><br><span class="line">- type: log</span><br><span class="line">  enabled: true</span><br><span class="line">  paths:</span><br><span class="line">    - /usr/local/nginx/logs/*_access.log</span><br><span class="line">  exclude_lines: [&apos;monitor&apos;]</span><br><span class="line">  fields:</span><br><span class="line">    Service: cn-serverlist</span><br><span class="line">  ignore_older: 2h</span><br><span class="line">filebeat.config.modules:</span><br><span class="line">  path: $&#123;path.config&#125;/modules.d/*.yml</span><br><span class="line">  reload.enabled: false</span><br><span class="line">  #reload.period: 10s</span><br><span class="line">setup.template.settings:</span><br><span class="line">  index.number_of_shards: 3</span><br><span class="line">setup.kibana:</span><br><span class="line">  host: &quot;172.16.31.59:5601&quot;</span><br><span class="line">output.logstash:</span><br><span class="line">  hosts: [&quot;172.16.31.62:5044&quot;]</span><br><span class="line">  ssl.certificate_authorities: [&quot;/etc/filebeat/ssl/ca/ca.crt&quot;]</span><br><span class="line">xpack.monitoring.enabled: true</span><br><span class="line">xpack.monitoring.elasticsearch:</span><br><span class="line">  hosts: [ &quot;https://172.16.31.59:9200&quot;, &quot;https://172.16.31.60:9200&quot;, &quot;https://172.16.31.61:9200&quot; ]</span><br><span class="line">  protocal: &quot;https&quot;</span><br><span class="line">  username: &quot;beats_system&quot;</span><br><span class="line">  password: &quot;beats-som&quot;</span><br><span class="line">  ssl.enabled: true</span><br><span class="line">  ssl.certificate_authorities: [&quot;/etc/filebeat/ssl/ca/ca.crt&quot;]</span><br></pre></td></tr></table></figure>
+<h3 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h3><p>创建 <code>beats_system</code> 角色，权限为 <img src="https://www.oneops.co/images/elk/x-pack_beats_role.png" alt></p>
+<h3 id="启动-filebeat"><a href="#启动-filebeat" class="headerlink" title="启动 filebeat"></a>启动 filebeat</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable filebeat</span><br><span class="line">systemctl start filebeat</span><br></pre></td></tr></table></figure>
+<h3 id="监控展示-3"><a href="#监控展示-3" class="headerlink" title="监控展示"></a>监控展示</h3><p><img src="https://www.oneops.co/images/elk/x-pack-filebeat-monitor.png" alt></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>完成上面部署，这样便可以通过kibana 看到<code>elasticsearch</code>、<code>kibana</code>、<code>logstash</code>、<code>filebeat</code>的监控数据。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/elasticstack/" rel="tag"> <i class="fa fa-tag"></i> elasticstack</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+               <div>
+                 
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+               </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/21/elasticstack-install-logstash.html" rel="next" title="开源日志系统ElasticStack搭建-logstash篇">
+                <i class="fa fa-chevron-left"></i> 开源日志系统ElasticStack搭建-logstash篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/22/static-etcd.html" rel="prev" title="基于静态发现方式部署Etcd集群">
+                基于静态发现方式部署Etcd集群 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjY0MS8xOTE4OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/blog/avatar.jpg" alt="Cc">
+            
+              <p class="site-author-name" itemprop="name">Cc</p>
+              <p class="site-description motion-element" itemprop="description">Love Linux ♥ Love Python. 猴赛雷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#x-pack介绍"><span class="nav-number">1.</span> <span class="nav-text">x-pack介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#x-pack-安装"><span class="nav-number">2.</span> <span class="nav-text">x-pack 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticsearch-安装及破解-x-pack"><span class="nav-number">2.1.</span> <span class="nav-text">elasticsearch 安装及破解 x-pack</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#正常安装-x-pack"><span class="nav-number">2.1.1.</span> <span class="nav-text">正常安装 x-pack</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#破解-x-pack"><span class="nav-number">2.1.2.</span> <span class="nav-text">破解 x-pack</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重置密码"><span class="nav-number">2.1.3.</span> <span class="nav-text">重置密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-SSL-认证"><span class="nav-number">2.1.4.</span> <span class="nav-text">配置 SSL 认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#导入授权"><span class="nav-number">2.1.5.</span> <span class="nav-text">导入授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控展示"><span class="nav-number">2.1.6.</span> <span class="nav-text">监控展示</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kibana安装-x-pack"><span class="nav-number">2.2.</span> <span class="nav-text">kibana安装 x-pack</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装插件"><span class="nav-number">2.2.1.</span> <span class="nav-text">安装插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#增加SSL认证"><span class="nav-number">2.2.2.</span> <span class="nav-text">增加SSL认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-kibana"><span class="nav-number">2.2.3.</span> <span class="nav-text">启动 kibana</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控展示-1"><span class="nav-number">2.2.4.</span> <span class="nav-text">监控展示</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logstash-安装-x-pack"><span class="nav-number">2.3.</span> <span class="nav-text">logstash 安装 x-pack</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装插件-1"><span class="nav-number">2.3.1.</span> <span class="nav-text">安装插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#增加SSL认证-1"><span class="nav-number">2.3.2.</span> <span class="nav-text">增加SSL认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置变更"><span class="nav-number">2.3.3.</span> <span class="nav-text">配置变更</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控展示-2"><span class="nav-number">2.3.4.</span> <span class="nav-text">监控展示</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#filebeat-通过SSL-传输数据"><span class="nav-number">2.4.</span> <span class="nav-text">filebeat 通过SSL 传输数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置证书"><span class="nav-number">2.4.1.</span> <span class="nav-text">配置证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-filebeat"><span class="nav-number">2.4.2.</span> <span class="nav-text">配置 filebeat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建用户"><span class="nav-number">2.4.3.</span> <span class="nav-text">创建用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-filebeat"><span class="nav-number">2.4.4.</span> <span class="nav-text">启动 filebeat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控展示-3"><span class="nav-number">2.4.5.</span> <span class="nav-text">监控展示</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.5.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cc</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2018/08/21/elasticstack-install-x-pack.html'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
+</body>
+</html>

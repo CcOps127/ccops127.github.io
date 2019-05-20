@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="什么是 GlusterFS GlusterFS 概述GlusterFS是 Scale-Out 存储解决方案 Gluster 的核心，他是一个开源的分布式文件系统，具有强大的横向扩展能力，通过扩展能够支持数PB存储容量和处理数千客户端。GlusterFS 借助 TCP/IP 或 InfiniBand RDMA (一种支持多并发链接的”转换线缆”技术)网络将物理分布的存储资源聚集在一起，使用单一全局命">
+<meta name="keywords" content="glusterfs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GlusterFS技术详解">
+<meta property="og:url" content="https://www.oneops.co/2017/12/19/glusterfs.html">
+<meta property="og:site_name" content="Cc&#39;s Blog">
+<meta property="og:description" content="什么是 GlusterFS GlusterFS 概述GlusterFS是 Scale-Out 存储解决方案 Gluster 的核心，他是一个开源的分布式文件系统，具有强大的横向扩展能力，通过扩展能够支持数PB存储容量和处理数千客户端。GlusterFS 借助 TCP/IP 或 InfiniBand RDMA (一种支持多并发链接的”转换线缆”技术)网络将物理分布的存储资源聚集在一起，使用单一全局命">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/logo.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/glusterfs_mount.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/gluster架构和组成.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/gluster模块化堆栈设计.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/GlusterFS弹性卷管理.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/AFR_DHT.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/Distributed_Volume.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/Replicated_Volume.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/Striped_Volume.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/Distributed_Replicated_Volume.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/Distributed_Striped_Volume.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/Distributed_Striped_Replicated_Volume.png">
+<meta property="og:image" content="https://www.oneops.co/images/glusterfs/Striped_Replicated_Volume.png">
+<meta property="og:updated_time" content="2019-05-20T06:57:34.990Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GlusterFS技术详解">
+<meta name="twitter:description" content="什么是 GlusterFS GlusterFS 概述GlusterFS是 Scale-Out 存储解决方案 Gluster 的核心，他是一个开源的分布式文件系统，具有强大的横向扩展能力，通过扩展能够支持数PB存储容量和处理数千客户端。GlusterFS 借助 TCP/IP 或 InfiniBand RDMA (一种支持多并发链接的”转换线缆”技术)网络将物理分布的存储资源聚集在一起，使用单一全局命">
+<meta name="twitter:image" content="https://www.oneops.co/images/glusterfs/logo.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.oneops.co/2017/12/19/glusterfs.html">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>GlusterFS技术详解 | Cc's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=71693959-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '71693959-4');
+</script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Cc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">生命不止 学习不息</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2017/12/19/glusterfs.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">GlusterFS技术详解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-12-19 23:53:45" itemprop="dateCreated datePublished" datetime="2017-12-19T23:53:45+08:00">2017-12-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-05-20 14:57:34" itemprop="dateModified" datetime="2019-05-20T14:57:34+08:00">2019-05-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="什么是-GlusterFS"><a href="#什么是-GlusterFS" class="headerlink" title="什么是 GlusterFS"></a>什么是 GlusterFS</h1><p><img src="https://www.oneops.co/images/glusterfs/logo.png" alt="logo"></p>
+<h2 id="GlusterFS-概述"><a href="#GlusterFS-概述" class="headerlink" title="GlusterFS 概述"></a>GlusterFS 概述</h2><p><a href="http://www.gluster.com/products/glusterfs/" target="_blank" rel="noopener">GlusterFS</a>是 Scale-Out 存储解决方案 Gluster 的核心，他是一个开源的分布式文件系统，具有强大的横向扩展能力，通过扩展能够支持数PB存储容量和处理数千客户端。GlusterFS 借助 TCP/IP 或 InfiniBand RDMA (一种支持多并发链接的”转换线缆”技术)网络将物理分布的存储资源聚集在一起，使用单一全局命名空间来管理数据。GlusterFS 基于可堆叠的用户空间设计，可为各种不同的数据负载提供优异的性能。</p>
+<a id="more"></a>
+<p><img src="https://www.oneops.co/images/glusterfs/glusterfs_mount.png" alt="glusterfs_mount"></p>
+<p>GlusterFS 支持运行在任何标准IP网络上标准应用程序的标准客户端，如图2所示，用户可以在全局统一的命名空间中使用NFS/CIFS等标准协议来访问应用数据。GlusterFS 使得用户可摆脱原有的独立、高成本的封闭存储系统，能够利用普通廉价的存储设备来部署可集中管理、横向扩展、虚拟化的存储池，存储容量可扩展至TB/PB级。GlusterFS主要特征如下：</p>
+<ul>
+<li><strong>扩展性和高性能</strong></li>
+</ul>
+<p>GlusterFS 利用双重特性来提供几TB至数PB的高扩展存储解决方案。Scale-Out 架构允许通过简单地增加资源来提高存储容量和性能，磁盘、计算和 I/O 资源都可以独立增加，支持 10GbE 和 InfiniBand 等高速网络互联。Gluster 弹性哈希（Elastic Hash）解除了 GlusterFS 对元数据服务器的需求，消除了单点故障和性能瓶颈，真正实现了并行化数据访问。</p>
+<ul>
+<li><strong>高可用性</strong></li>
+</ul>
+<p>GlusterFS 可以对文件进行自动复制，如镜像或多次复制，从而确保数据总是可以访问，甚至是在硬件故障的情况下也能正常访问。自我修复功能能够把数据恢复到正确的状态，而且修复是以增量的方式在后台执行，几乎不会产生性能负载。GlusterFS 没有设计自己的私有数据文件格式，而是采用操作系统中主流标准的磁盘文件系统（如 EXT3、ZFS）来存储文件，因此数据可以使用各种标准工具进行复制和访问。</p>
+<ul>
+<li><strong>全局统一命名空间</strong></li>
+</ul>
+<p>全局统一命名空间将磁盘和内存资源聚集成一个单一的虚拟存储池，对上层用户和应用屏蔽了底层的物理硬件。存储资源可以根据需要在虚拟存储池中进行弹性扩展， 比如扩容或收缩。当存储虚拟机映像时，存储的虚拟映像文件没有数量限制，成千虚拟机均通过单一挂载点进行数据共享。虚拟机I/O可在命名空间内的所有服务器上自动进行负载均衡，消除了SAN环境中经常发生的访问热点和性能瓶颈问题。</p>
+<ul>
+<li><strong>弹性哈希算法</strong></li>
+</ul>
+<p>GlusterFS采用弹性哈希算法在存储池中定位数据，而不是采用集中式或分布式元数据服务器索引。在其他的Scale-Out存储系统中，元数据服务器通常会导致I/O性能瓶颈和单点故障问题。GlusterFS中，所有在Scale-Out存储配置中的存储系统都可以智能地定位任意数据分片，不需要查看索引或者向其他服务器查询。这种设计机制完全并行化了数据访问，实现了真正的线性性能扩展。</p>
+<ul>
+<li><strong>弹性卷管理</strong></li>
+</ul>
+<p>数 据储存在逻辑卷中，逻辑卷可以从虚拟化的物理存储池进行独立逻辑划分而得到。存储服务器可以在线进行增加和移除，不会导致应用中断。逻辑卷可以在所有配置 服务器中增长和缩减，可以在不同服务器迁移进行容量均衡，或者增加和移除系统，这些操作都可在线进行。文件系统配置更改也可以实时在线进行并应用，从而可 以适应工作负载条件变化或在线性能调优。</p>
+<ul>
+<li><strong>基于标准协议</strong></li>
+</ul>
+<p>Gluster存储服务支持NFS, CIFS, HTTP, FTP 以及 Gluster 原生协议，完全与 POSIX 标准兼容。现有应用程序不需要作任何修改或使用专用 API，就可以对 Gluster 中的数据进行访问。这在公有云环境中部署 Gluster 时非常有用，Gluster 对云服务提供商专用API进行抽象，然后提供标准 POSIX 接口。</p>
+<hr>
+<h2 id="设计目标"><a href="#设计目标" class="headerlink" title="设计目标"></a>设计目标</h2><p>GlusterFS 的设计思想显著区别有现有并行/集群/分布式文件系统。如果 GlusterFS 在设计上没有本质性的突破，难以在与 Lustre、PVFS2、Ceph 等的竞争中占据优势，更别提与 GPFS、StorNext、ISILON、IBRIX 等具有多年技术沉淀和市场积累的商用文件系统竞争。其核心设计目标包括如下三个：</p>
+<ul>
+<li><strong>弹性存储系统（Elasticity）</strong></li>
+</ul>
+<p>存储系统具有弹性能力，意味着企业可以根据业务需要灵活地增加或缩减数据存储以及增删存储池中的资源，而不需要中断系统运行。GlusterFS 设计目标之一就是弹性，允许动态增删数据卷、扩展或缩减数据卷、增删存储服务器等，不影响系统正常运行和业务服务。GlusterFS 早期版本中弹性不足，部分管理工作需要中断服务，目前最新的 3.1.X 版本已经弹性十足，能够满足对存储系统弹性要求高的应用需求，尤其是对云存储服务系统而言意义更大。GlusterFS 主要通过存储虚拟化技术和逻辑卷管理来实现这一设计目标。</p>
+<ul>
+<li><strong>线性横向扩展（Linear Scale-Out）</strong></li>
+</ul>
+<p>线性扩展对于存储系统而言是非常难以实现的，通常系统规模扩展与性能提升之间是 LOG 对数曲线关系，因为同时会产生相应负载而消耗了部分性能的提升。现在的很多并行/集群/分布式文件系统都具很高的扩展能力，Luster 存储节点可以达到 1000 个以上，客户端数量能够达到 25000 以上，这个扩展能力是非常强大的，但是Lustre也不是线性扩展的。</p>
+<p>纵向扩展（Scale-Up）旨在提高单个节点的存储容量或性能，往往存在理论上或物理上的各种限制，而无法满足存储需求。横向扩展（Scale-Out）通过增加存储节点来提升整个系统的容量或性能，这一扩展机制是目前的存储技术热点，能有效应对容量、性能等存储需求。目前的并行/集群/分布式文件系统大多都具备横向扩展能力。</p>
+<p>GlusterFS是线性横向扩展架构，它通过横向扩展存储节点即可以获得线性的存储容量和性能的提升。因此，结合纵向扩展GlusterFS可以获得多维扩展能力，增加每个节点的磁盘可增加存储容量，增加存储节点可以提高性能，从而将更多磁盘、内存、I/O资源聚集成更大容量、更高性能的虚拟存储池。GlusterFS利用三种基本技术来获得线性横向扩展能力</p>
+<p>1. <strong>消除元数据服务</strong></p>
+<p>2. <strong>高效数据分布，获得扩展性和可靠性</strong></p>
+<p>3. <strong>通过完全分布式架构的并行化获得性能的最大化</strong></p>
+<p>4. <strong>高可靠性（Reliability）</strong></p>
+<p>与GFS（Google File System）类似，GlusterFS 可以构建在普通的服务器和存储设备之上，因此可靠性显得尤为关键。GlusterFS 从设计之初就将可靠性纳入核心设计，采用了多种技术来实现这一设计目标。首先，它假设故障是正常事件，包括硬件、磁盘、网络故障以及管理员误操作造成的数据损坏等。GlusterFS 设计支持自动复制和自动修复功能来保证数据可靠性，不需要管理员的干预。其次，GlusterFS 利用了底层 EXT3/ZFS 等磁盘文件系统的日志功能来提供一定的数据可靠性，而没有自己重新发明轮子。再次，GlusterFS 是无元数据服务器设计，不需要元数据的同步或者一致性维护，很大程度上降低了系统复杂性，不仅提高了性能，还大大提高了系统可靠性。</p>
+<hr>
+<h2 id="技术特点"><a href="#技术特点" class="headerlink" title="技术特点"></a>技术特点</h2><p>GlusterFS在技术实现上与传统存储系统或现有其他分布式文件系统有显著不同之处，主要体现在如下几个方面。</p>
+<ul>
+<li><strong>完全软件实现（Software Only）</strong></li>
+</ul>
+<p>GlusterFS 认为存储是软件问题，不能够把用户局限于使用特定的供应商或硬件配置来解决。GlusterFS 采用开放式设计，广泛支持工业标准的存储、网络和计算机设备，而非与定制化的专用硬件设备捆绑。对于商业客户，GlusterFS 可以以虚拟装置的形式交付，也可以与虚拟机容器打包，或者是公有云中部署的映像。开源社区中，GlusterFS 被大量部署在基于廉价闲置硬件的各种操作系统上，构成集中统一的虚拟存储资源池。简而言之，GlusterFS 是开放的全软件实现，完全独立于硬件和操作系统。</p>
+<ul>
+<li><strong>完整的存储操作系统栈（Complete Storage Operating System Stack）</strong></li>
+</ul>
+<p>GlusterFS 不仅提供了一个分布式文件系统，而且还提供了许多其他重要的分布式功能，比如分布式内存管理、I/O 调度、软 RAID 和自我修复等。GlusterFS 汲取了微内核架构的经验教训，借鉴了 GNU/Hurd 操作系统的设计思想，在用户空间实现了完整的存储操作系统栈。</p>
+<ul>
+<li><strong>用户空间实现（User Space）</strong></li>
+</ul>
+<p>与传统的文件系统不同，GlusterFS在用户空间实现，这使得其安装和升级特别简便。另外，这也极大降低了普通用户基于源码修改 GlusterFS 的门槛，仅仅需要通用的C程序设计技能，而不需要特别的内核编程经验。</p>
+<ul>
+<li><strong>模块化堆栈式架构（Modular Stackable Architecture）</strong></li>
+</ul>
+<p>GlusterFS 采用模块化、堆栈式的架构，可通过灵活的配置支持高度定制化的应用环境，比如大文件存储、海量小文件存储、云存储、多传输协议应用等。每个功能以模块形式实现，然后以积木方式进行简单的组合，即可实现复杂的功能。比如，Replicate 模块可实现 RAID1，Stripe 模块可实现 RAID0，通过两者的组合可实现 RAID10和RAID01，同时获得高性能和高可靠性。</p>
+<ul>
+<li><strong>原始数据格式存储（Data Stored in Native Formats）</strong></li>
+</ul>
+<p>GlusterFS 以原始数据格式（如 EXT3、EXT4、XFS、ZFS）储存数据，并实现多种数据自动修复机制。因此，系统极具弹性，即使离线情形下文件也可以通过其他标准工具进行访问。如果用户需要从 GlusterFS 中迁移数据，不需要作任何修改仍然可以完全使用这些数据。</p>
+<ul>
+<li><strong>无元数据服务设计（No Metadata with the Elastic Hash Algorithm）</strong></li>
+</ul>
+<p>对 Scale-Out 存 储系统而言，最大的挑战之一就是记录数据逻辑与物理位置的映像关系，即数据元数据，可能还包括诸如属性和访问权限等信息。传统分布式存储系统使用集中式或 分布式元数据服务来维护元数据，集中式元数据服务会导致单点故障和性能瓶颈问题，而分布式元数据服务存在性能负载和元数据同步一致性问题。特别是对于海量 小文件的应用，元数据问题是个非常大的挑战。</p>
+<p>GlusterFS 独 特地采用无元数据服务的设计，取而代之使用算法来定位文件，元数据和数据没有分离而是一起存储。集群中的所有存储系统服务器都可以智能地对文件数据分片进 行定位，仅仅根据文件名和路径并运用算法即可，而不需要查询索引或者其他服务器。这使得数据访问完全并行化，从而实现真正的线性性能扩展。无元数据服务器 极大提高了 GlusterFS 的性能、可靠性和稳定性。</p>
+<hr>
+<h2 id="总体架构和设计"><a href="#总体架构和设计" class="headerlink" title="总体架构和设计"></a>总体架构和设计</h2><p><img src="https://www.oneops.co/images/glusterfs/gluster架构和组成.png" alt="gluster架构和组成"></p>
+<p>GlusterFS总体架构与组成部分如上图所示，它主要由存储服务器（Brick Server）、客户端以及 NFS/Samba 存储网关组成。不难发现，GlusterFS 架构中没有元数据服务器组件，这是其最大的设计这点，对于提升整个系统的性能、可靠性和稳定性都有着决定性的意义。GlusterFS 支持 TCP/IP 和 InfiniBand RDMA 高速网络互联，客户端可通过原生Glusterfs协议访问数据，其他没有运行 GlusterFS 客户端的终端可通过 NFS/CIFS 标准协议通过存储网关访问数据。</p>
+<p>存储服务器主要提供基本的数据存储功能，最终的文件数据通过统一的调度策略分布在不同的存储服务器上。它们上面运行着Glusterfsd进行，负责处理来自其他组件的数据服务请求。如前所述，数据以原始格式直接存储在服务器的本地文件系统上，如EXT3、EXT4、XFS、ZFS等，运行服务时指定数据存储路径。多个存储服务器可以通过客户端或存储网关上的卷管理器组成集群，如Stripe（RAID0）、Replicate（RAID1）和DHT（分布式Hash）存储集群，也可利用嵌套组合构成更加复杂的集群，如RAID10。</p>
+<p>由于没有了元数据服务器，客户端承担了更多的功能，包括数据卷管理、I/O 调度、文件定位、数据缓存等功能。客户端上运行 Glusterfs 进程，它实际是 Glusterfsd 的符号链接，利用 FUSE（File system in User Space）模块将GlusterFS 挂载到本地文件系统之上，实现 POSIX 兼容的方式来访问系统数据。在最新的 3.1.X 版本中，客户端不再需要独立维护卷配置信息，改成自动从运行在网关上的 glusterd 弹性卷管理服务进行获取和更新，极大简化了卷管理。GlusterFS 客户端负载相对传统分布式文件系统要高，包括CPU占用率和内存占用。</p>
+<p>GlusterFS 存储网关提供弹性卷管理和 NFS/CIFS 访问代理功能，其上运行 Glusterd 和 Glusterfs 进程，两者都是 Glusterfsd 符号链接。卷管理器负责逻辑卷的创建、删除、容量扩展与缩减、容量平滑等功能，并负责向客户端提供逻辑卷信息及主动更新通知功能等。GlusterFS 3.1.X 实现了逻辑卷的弹性和自动化管理，不需要中断数据服务或上层应用业务。对于Windows客户端或没有安装 GlusterFS 的客户端，需要通过 NFS/CIFS 代理网关来访问，这时网关被配置成 NFS 或 Samba 服务器。相对原生客户端，网关在性能上要受到 NFS/Samba 的制约。</p>
+<p><img src="https://www.oneops.co/images/glusterfs/gluster模块化堆栈设计.png" alt="gluster模块化堆栈设计"></p>
+<p>GlusterFS 是模块化堆栈式的架构设计，如图3所示。模块称为 Translator，是 GlusterFS 提供的一种强大机制，借助这种良好定义的接口可以高效简便地扩展文件系统的功能。服务端与客户端模块接口是兼容的，同一个 translator可同时在两边加载。每个 translator 都是 SO 动态库，运行时根据配置动态加载。每个模块实现特定基本功能，GlusterFS 中所有的功能都是通过 translator 实现，比如Cluster, Storage, Performance, Protocol, Features等，基本简单的模块可以通过堆栈式的组合来实现复杂的功能。这一设计思想借鉴了 GNU/Hurd 微内核的虚拟文件系统设计，可以把对外部系统的访问转换成目标系统的适当调用。大部分模块都运行在客户端，比如合成器、I/O调度器和性能优化等，服务端相对简单许多。客户端和存储服务器均有自己的存储栈，构成了一棵 Translator 功能树，应用了若干模块。模块化和堆栈式的架构设计，极大降低了系统设计复杂性，简化了系统的实现、升级以及系统维护。</p>
+<hr>
+<h2 id="弹性哈希算法"><a href="#弹性哈希算法" class="headerlink" title="弹性哈希算法"></a>弹性哈希算法</h2><p>对于分布式系统而言，元数据处理是决定系统扩展性、性能以及稳定性的关键。GlusterFS 另辟蹊径，彻底摒弃了元数据服务，使用弹性哈希算法代替传统分布式文件系统中的集中或分布式元数据服务。这根本性解决了元数据这一难题，从而获得了接近线性的高扩展性，同时也提高了系统性能和可靠性。GlusterFS 使用算法进行数据定位，集群中的任何服务器和客户端只需根据路径和文件名就可以对数据进行定位和读写访问。换句话说，GlusterFS 不需要将元数据与数据进行分离，因为文件定位可独立并行化进行。GlusterFS 中数据访问流程如下</p>
+<ol>
+<li><strong>计算hash值，输入参数为文件路径和文件名；</strong></li>
+<li><strong>根据hash值在集群中选择子卷（存储服务器），进行文件定位；</strong></li>
+<li><strong>对所选择的子卷进行数据访问。</strong></li>
+</ol>
+<p>GlusterFS目前使用Davies-Meyer算法计算文件名hash值，获得一个32位整数。Davies-Meyer 算法具有非常好的hash分布性，计算效率很高。假设逻辑卷中的存储服务器有N个，则32位整数空间被平均划分为N个连续子空间，每个空间分别映射到一个存储服务器。这样，计算得到的32位hash值就会被投射到一个存储服务器，即我们要选择的子卷。难道真是如此简单？现在让我们来考虑一下存储节点加入和删除、文件改名等情况，GlusterFS如何解决这些问题而具备弹性的呢？</p>
+<p>逻辑卷中加入一个新存储节点，如果不作其他任何处理，hash 值 映射空间将会发生变化，现有的文件目录可能会被重新定位到其他的存储服务器上，从而导致定位失败。解决问题的方法是对文件目录进行重新分布，把文件移动到 正确的存储服务器上去，但这大大加重了系统负载，尤其是对于已经存储大量的数据的海量存储系统来说显然是不可行的。另一种方法是使用一致性哈希算法，修改 新增节点及相邻节点的 hash 映射空间，仅需要移动相邻节点上的部分数据至新增节点，影响相对小了很多。然而，这又带来另外一个问题，即系统整体负载不均衡。GlusterFS 没有采用上述两种方法，而是设计了更为弹性的算法。GlusterFS 的 哈希分布是以目录为基本单位的，文件的父目录利用扩展属性记录了子卷映射信息，其下面子文件目录在父目录所属存储服务器中进行分布。由于文件目录事先保存 了分布信息，因此新增节点不会影响现有文件存储分布，它将从此后的新创建目录开始参与存储分布调度。这种设计，新增节点不需要移动任何文件，但是负载均衡 没有平滑处理，老节点负载较重。GlusterFS 在设计中考虑了这一问题，在新建文件时会优先考虑容量负载最轻的节点，在目标存储节点上创建文件链接直向真正存储文件的节点。另外，GlusterFS 弹性卷管理工具可以在后台以人工方式来执行负载平滑，将进行文件移动和重新分布，此后所有存储服务器都会均会被调度。</p>
+<p>GlusterFS目前对存储节点删除支持有限，还无法做到完全无人干预的程度。如果直接删除节点，那么所在存储服务器上的文件将无法浏览和访问，创建文件目录也会失败。当前人工解决方法有两个，一是将节点上的数据重新复制到GlusterFS中，二是使用新的节点来替换删除节点并保持原有数据。</p>
+<p>如果一个文件被改名，显然hash算法将产生不同的值，非常可能会发生文件被定位到不同的存储服务器上，从而导致文件访问失败。采用数据移动的方法，对于大文件是很难在实时完成的。为了不影响性能和服务中断，GlusterFS采 用了文件链接来解决文件重命名问题，在目标存储服务器上创建一个链接指向实际的存储服务器，访问时由系统解析并进行重定向。另外，后台同时进行文件迁移， 成功后文件链接将被自动删除。对于文件移动也作类似处理，好处是前台操作可实时处理，物理数据迁移置于后台选择适当时机执行。</p>
+<p><img src="https://www.oneops.co/images/glusterfs/GlusterFS弹性卷管理.png" alt="GlusterFS弹性卷管理"></p>
+<p>弹性哈希算法为文件分配逻辑卷，那么 GlusterFS 如何为逻辑卷分配物理卷呢？GlusterFS3.1.X 实现了真正的弹性卷管理，如图4所 示。存储卷是对底层硬件的抽象，可以根据需要进行扩容和缩减，以及在不同物理系统之间进行迁移。存储服务器可以在线增加和移除，并能在集群之间自动进行数 据负载平衡，数据总是在线可用，没有应用中断。文件系统配置更新也可以在线执行，所作配置变动能够快速动态地在集群中传播，从而自动适应负载波动和性能调优。 弹性哈希算法本身并没有提供数据容错功能，GlusterFS使用镜像或复制来保证数据可用性，推荐使用镜像或3路复制。复制模式下，存储服务器使用同步写复制到其他的存储服务器，单个服务器故障完全对客户端透明。此外，GlusterFS没有对复制数量进行限制，读被分散到所有的镜像存储节点，可以提高读性能。弹性哈希算法分配文件到唯一的逻辑卷，而复制可以保证数据至少保存在两个不同存储节点，两者结合使得GlusterFS具备更高的弹性。</p>
+<hr>
+<h2 id="Translators"><a href="#Translators" class="headerlink" title="Translators"></a>Translators</h2><p>如前所述，Translators 是 GlusterFS 提供的一种强大文件系统功能扩展机制，这一设计思想借鉴于 GNU/Hurd 微内核操作系统。GlusterFS 中所有的功能都通过 Translator 机制实现，运行时以动态库方式进行加载，服务端和客户端相互兼容。GlusterFS 3.1.X中，主要包括以下几类 Translator</p>
+<ol>
+<li><strong>Cluster</strong>：存储集群分布，目前有 AFR, DHT, Stripe 三种方式</li>
+<li><strong>Debug</strong>：跟踪 GlusterFS 内部函数和系统调用</li>
+<li><strong>Encryption</strong>：简单的数据加密实现</li>
+<li><strong>Features</strong>：访问控制、锁、Mac兼容、静默、配额、只读、回收站等</li>
+<li><strong>Mgmt</strong>：弹性卷管理</li>
+<li><strong>Mount</strong>：FUSE接口实现</li>
+<li><strong>Nfs</strong>：内部NFS服务器</li>
+<li><strong>Performance</strong>：io-cache, io-threads, quick-read, read-ahead, stat-prefetch, sysmlink-cache, write-behind等性能优化</li>
+<li><strong>Protocol</strong>：服务器和客户端协议实现</li>
+<li><strong>Storage</strong>：底层文件系统POSIX接口实现</li>
+</ol>
+<p>这里我们重点介绍一下Cluster Translators，它是实现GlusterFS集群存储的核心，它包括AFR（Automatic File Replication）、DHT（Distributed Hash Table）和Stripe三种类型。</p>
+<p>AFR相当于RAID1，同一文件在多个存储节点上保留多份，主要用于实现高可用性以及数据自动修复。AFR所有子卷上具有相同的名字空间，查找文件时从第一个节点开始，直到搜索成功或最后节点搜索完毕。读数据时，AFR会把所有请求调度到所有存储节点，进行负载均衡以提高系统性能。写数据时，首先需要在所有锁服务器上对文件加锁，默认第一个节点为锁服务器，可以指定多个。然后，AFR以日志事件方式对所有服务器进行写数据操作，成功后删除日志并解锁。AFR会自动检测并修复同一文件的数据不一致性，它使用更改日志来确定好的数据副本。自动修复在文件目录首次访问时触发，如果是目录将在所有子卷上复制正确数据，如果文件不存则创建，文件信息不匹配则修复，日志指示更新则进行更新。</p>
+<p>DHT即上面所介绍的弹性哈希算法，它采用 hash 方式进行数据分布，名字空间分布在所有节点上。查找文件时，通过弹性哈希算法进行，不依赖名字空间。但遍历文件目录时，则实现较为复杂和低效，需要搜索所有的存储节点。单一文件只会调度到唯一的存储节点，一旦文件被定位后，读写模式相对简单。DHT 不具备容错能力，需要借助AFR实现高可用性, 如图5所示应用案例。</p>
+<p>Stripe 相当于 RAID0，即分片存储，文件被划分成固定长度的数据分片以 Round-Robin 轮转方式存储在所有存储节点。Stripe 所有存储节点组成完整的名字空间，查找文件时需要询问所有节点，这点非常低效。读写数据时，Stripe涉及全部分片存储节点，操作可以在多个节点之间并发执行，性能非常高。Stripe 通常与 AFR 组合使用，构成 RAID10/RAID01，同时获得高性能和高可用性，当然存储利用率会低于50%。</p>
+<p><img src="https://www.oneops.co/images/glusterfs/AFR_DHT.png" alt="AFR_DHT"></p>
+<hr>
+<h2 id="设计讨论"><a href="#设计讨论" class="headerlink" title="设计讨论"></a>设计讨论</h2><p>GlusterFS 是一个具有高扩展性、高性能、高可用性、可横向扩展的弹性分布式文件系统，在架构设计上非常有特点，比如无元数据服务器设计、堆栈式架构等。然而，存储应用问题是很复杂的，GlusterFS也不可能满足所有的存储需求，设计实现上也一定有考虑不足之处，下面我们作简要分析。</p>
+<ul>
+<li><strong>无元数据服务器 vs 元数据服务器</strong></li>
+</ul>
+<p>无元数据服务器设计的好处是没有单点故障和性能瓶颈问题，可提高系统扩展性、性能、可靠性和稳定性。对于海量小文件应用，这种设计能够有效解决元数据的难点 问题。它的负面影响是，数据一致问题更加复杂，文件目录遍历操作效率低下，缺乏全局监控管理功能。同时也导致客户端承担了更多的职能，比如文件定位、名字 空间缓存、逻辑卷视图维护等等，这些都增加了客户端的负载，占用相当的 CPU 和内存。</p>
+<ul>
+<li><strong>用户空间 vs 内核空间</strong></li>
+</ul>
+<p>用户空间实现起来相对要简单许多，对开发者技能要求较低，运行相对安全。用户空间效率低，数据需要多次与内核空间交换，另外 GlusterFS 借助 FUSE 来实现标准文件系统接口，性能上又有所损耗。内核空间实现可以获得很高的数据吞吐量，缺点是实现和调试非常困难，程序出错经常会导致系统崩溃，安全性低。纵向扩展上，内核空间要优于用户空间，GlusterFS 有横向扩展能力来弥补。</p>
+<ul>
+<li><strong>堆栈式 vs 非堆栈式</strong></li>
+</ul>
+<p>这有点像操作系统的微内核设计与单一内核设计之争。GlusterFS 堆栈式设计思想源自 GNU/Hurd 微内核操作系统，具有很强的系统扩展能力，系统设计实现复杂性降低很多，基本功能模块的堆栈式组合就可以实现强大的功能。查看GlusterFS卷配置文件我们可以发现，translator 功能树通常深达 10 层以上，一层一层进行调用，效率可见一斑。非堆栈式设计可看成类似 Linux 的单一内核设计，系统调用通过中断实现，非常高效。后者的问题是系统核心臃肿，实现和扩展复杂，出现问题调试困难。</p>
+<ul>
+<li><strong>原始存储格式 vs 私有存储格式</strong></li>
+</ul>
+<p>GlusterFS使 用原始格式存储文件或数据分片，可以直接使用各种标准的工具进行访问，数据互操作性好，迁移和数据管理非常方便。然而，数据安全成了问题，因为数据是以平凡的方式保存的，接触数据的人可以直接复制和查看。这对很多应用显然是不能接受的，比如云存储系统，用户特别关心数据安全，这也是影响公有云存储发展的一 个重要原因。私有存储格式可以保证数据的安全性，即使泄露也是不可知的。GlusterFS要实现自己的私有格式，在设计实现和数据管理上相对复杂一些，也会对性能产生一定影响。</p>
+<ul>
+<li><strong>大文件 vs 小文件</strong></li>
+</ul>
+<p>GlusterFS 适合大文件还是小文件存储？弹性哈希算法和 Stripe 数据分布策略，移除了元数据依赖，优化了数据分布，提高数据访问并行性，能够大幅提高大文件存储的性能。对于小文件，无元数据服务设计解决了元数据的问题。但GlusterFS 并没有在I/O方面作优化，在存储服务器底层文件系统上仍然是大量小文件，本地文件系统元数据访问是一个瓶颈，数据分布和并行性也无法充分发挥作用。因此，GlusterFS 适合存储大文件，小文件性能较差，还存在很大优化空间。</p>
+<ul>
+<li><strong>可用性 vs 存储利用率</strong></li>
+</ul>
+<p>GlusterFS 使用复制技术来提供数据高可用性，复制数量没有限制，自动修复功能基于复制来实现。可用性与存储利用率是一个矛盾体，可用性高存储利用率就低，反之亦然。采用复制技术，存储利用率为1/复制数，镜像是 50%，三路复制则只有33%。其实，可以有方法来同时提高可用性和存储利用率，比如 RAID5 的利用率是 (n-1)/n，RAID6 是 (n-2)/n，而纠删码技术可以提供更高的存储利用率。但是，鱼和熊掌不可得兼，它们都会对性能产生较大影响。另外，GlusterFS 目前的代码实现不够好，系统不够稳定，BUGS 数量相对还比较多。从其官方网站的部署情况来看，测试用户非常多，但是真正在生产环境中的应用较少，存储部署容量几TB－几十TB 的占很大比率，数百TB－PB 级案例非常少。这也可以从另一个方面说明，GlusterFS 目前还不够稳定，需要更长的时间来检验。然而不可否认，GlusterFS 是一个有着光明前景的集群文件系统，线性横向扩展能力使它具有天生的优势，尤其是对于云存储系统。</p>
+<hr>
+<h1 id="使用-GlusterFS"><a href="#使用-GlusterFS" class="headerlink" title="使用 GlusterFS"></a>使用 GlusterFS</h1><h2 id="术语解释"><a href="#术语解释" class="headerlink" title="术语解释"></a>术语解释</h2><p><strong>Brick</strong> ：GFS 中的存储单元，通过是一个受信存储池中的服务器的一个导出目录。可以通过主机名和目录名来标识，如’SERVER:EXPORT’</p>
+<p><strong>Client</strong> ：挂载了 GFS 卷的设备</p>
+<p><strong>Extended Attributes:xattr</strong> 是一个文件系统的特性，其支持用户或程序关联文件/目录和元数据。</p>
+<p><strong>FUSE:Filesystem</strong> Userspace 是一个可加载的内核模块，其支持非特权用户创建自己的文件系统而不需要修改内核代码。通过在用户空间运行文件系统的代码通过 FUSE 代码与内核进行桥接。</p>
+<p><strong>Geo-Replication</strong> 异地备份</p>
+<p><strong>GFID</strong> ：GFS 卷中的每个文件或目录都有一个唯一的 128位 的数据相关联，其用于模拟 inode</p>
+<p><strong>Namespace</strong> ：每个 Gluster 卷都导出单个 ns 作为 POSIX 的挂载点</p>
+<p><strong>Node</strong> ：一个拥有若干 brick 的设备</p>
+<p><strong>RDMA</strong>：远程直接内存访问，支持不通过双方的 OS 进行直接内存访问。</p>
+<p><strong>RRDNS</strong>：round robin DNS是一种通过 DNS 轮转返回不同的设备以进行负载均衡的方法</p>
+<p><strong>Self-heal</strong>：用于后台运行检测复本卷中文件和目录的不一致性并解决这些不一致。</p>
+<p><strong>Split-brain</strong>：脑裂</p>
+<p><strong>Translator</strong>： 翻译器，类似 Linux 系统的文件系统</p>
+<p><strong>Volfile</strong>：glusterfs 进程的配置文件，通常位于 <code>/var/lib/glusterd/vols/volname</code></p>
+<p><strong>Volume</strong>：一组 bricks 的逻辑集合</p>
+<hr>
+<h2 id="安装-GlusterFS"><a href="#安装-GlusterFS" class="headerlink" title="安装 GlusterFS"></a>安装 GlusterFS</h2><h3 id="系统环境介绍"><a href="#系统环境介绍" class="headerlink" title="系统环境介绍"></a>系统环境介绍</h3><ul>
+<li>OS版本：<code>CentOS Linux release 7.1.1503 (Core)</code></li>
+<li>软件版本： 3.7.3（最新为3.7.10）</li>
+<li>系统节点</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">ip地址</th>
+<th style="text-align:left">挂载路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">172.16.18.241</td>
+<td style="text-align:left">/export/brick1/gv0</td>
+</tr>
+<tr>
+<td style="text-align:left">172.16.18.242</td>
+<td style="text-align:left">/export/brick1/gv0</td>
+</tr>
+<tr>
+<td style="text-align:left">172.16.18.243</td>
+<td style="text-align:left">/export/brick1/gv0</td>
+</tr>
+<tr>
+<td style="text-align:left">172.16.18.244</td>
+<td style="text-align:left">/export/brick1/gv0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="安装-GlusterFS-1"><a href="#安装-GlusterFS-1" class="headerlink" title="安装 GlusterFS"></a>安装 GlusterFS</h3><h4 id="安装软件包"><a href="#安装软件包" class="headerlink" title="安装软件包"></a>安装软件包</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 下载 GlusterFs yum 源配置</span><br><span class="line">wget -P /etc/yum.repos.d http://download.gluster.org/pub/gluster/glusterfs/LATEST/CentOS/glusterfs-epel.repo</span><br><span class="line"></span><br><span class="line">// 安装GlusterFS</span><br><span class="line">yum install -y glusterfs glusterfs-fuse glusterfs-server xfsprogs</span><br></pre></td></tr></table></figure>
+<h4 id="配置开机启动"><a href="#配置开机启动" class="headerlink" title="配置开机启动"></a>配置开机启动</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#systemctl enable glusterfsd.service</span><br><span class="line">systemctl enable glusterd.service</span><br><span class="line">systemctl start glusterd</span><br><span class="line">#systemctl start glusterfsd</span><br></pre></td></tr></table></figure>
+<h2 id="配置-GlusterFS-集群"><a href="#配置-GlusterFS-集群" class="headerlink" title="配置 GlusterFS 集群"></a>配置 GlusterFS 集群</h2><h3 id="添加节点到-GlusterFS-集群"><a href="#添加节点到-GlusterFS-集群" class="headerlink" title="添加节点到 GlusterFS 集群"></a>添加节点到 GlusterFS 集群</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">//添加节点到存储池，在其中一个节点上操作</span><br><span class="line">gluster peer probe 172.16.18.241</span><br><span class="line">peer probe: success: on localhost not needed</span><br><span class="line"></span><br><span class="line">gluster peer probe 172.16.18.242</span><br><span class="line">peer probe: success</span><br><span class="line"></span><br><span class="line">gluster peer probe 172.16.18.243</span><br><span class="line">peer probe: success</span><br><span class="line"></span><br><span class="line">gluster peer probe 172.16.18.244</span><br><span class="line">peer probe: success</span><br><span class="line"></span><br><span class="line">//查看各个节点状态</span><br><span class="line">gluster peer status</span><br><span class="line">Number of Peers: 3</span><br><span class="line">Hostname: 172.16.18.242</span><br><span class="line">Uuid: beb0aae7-a939-45ec-a273-0c21c2f59546</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.243</span><br><span class="line">Uuid: eab486b3-d1a1-4851-b9ec-45aab1ef9a66</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.244</span><br><span class="line">Uuid: 3108764d-d6b3-4356-810d-88872d56ceb6</span><br><span class="line">State: Peer in Cluster (Connected)</span><br></pre></td></tr></table></figure>
+<h3 id="创建数据存储目录"><a href="#创建数据存储目录" class="headerlink" title="创建数据存储目录"></a>创建数据存储目录</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">parted  /dev/sdb rm 1</span><br><span class="line">mkfs.xfs -i size=512 /dev/sdb -f</span><br><span class="line">mkdir -p /export/brick1</span><br><span class="line">/bin/mount -t xfs /dev/sdb /export/brick1</span><br><span class="line">mkdir /export/brick1/gv0</span><br><span class="line">echo &quot;/dev/sdb        /export/brick1  xfs     defaults        1       2&quot; &gt;&gt; /etc/fstab</span><br></pre></td></tr></table></figure>
+<h3 id="创建-GlusterFS-磁盘卷"><a href="#创建-GlusterFS-磁盘卷" class="headerlink" title="创建 GlusterFS 磁盘卷"></a>创建 GlusterFS 磁盘卷</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// 创建系统卷 gv0（副本卷）</span><br><span class="line">gluster volume create gv0 replica 2 172.16.18.241:/export/brick1/gv0 172.16.18.242:/export/brick1/gv0 172.16.18.243:/export/brick1/gv0 172.16.18.244:/export/brick1/gv0 force</span><br><span class="line"></span><br><span class="line">//启动系统卷 gv0</span><br><span class="line"> gluster volume start gv0</span><br><span class="line">volume create: gv0: success: please start the volume to access data</span><br><span class="line"></span><br><span class="line">//查看系统卷信息</span><br><span class="line">gluster volume info</span><br><span class="line"></span><br><span class="line">Volume Name: gv0</span><br><span class="line">Type: Distributed-Replicate</span><br><span class="line">Volume ID: e64cb61c-0f18-41b5-bf4d-c45ee085ca3b</span><br><span class="line">Status: Started</span><br><span class="line">Number of Bricks: 2 x 2 = 4</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: 172.16.18.241:/export/brick1/gv0</span><br><span class="line">Brick2: 172.16.18.242:/export/brick1/gv0</span><br><span class="line">Brick3: 172.16.18.243:/export/brick1/gv0</span><br><span class="line">Brick4: 172.16.18.244:/export/brick1/gv0</span><br><span class="line">Options Reconfigured:</span><br><span class="line">performance.readdir-ahead: on</span><br></pre></td></tr></table></figure>
+<h3 id="安装客户端并-mount-GlusterFS-文件系统"><a href="#安装客户端并-mount-GlusterFS-文件系统" class="headerlink" title="安装客户端并 mount GlusterFS 文件系统"></a>安装客户端并 mount GlusterFS 文件系统</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// 下载仓库文件</span><br><span class="line">wget -P /etc/yum.repos.d  http://download.gluster.org/pub/gluster/glusterfs/LATEST/CentOS/glusterfs-epel.repo</span><br><span class="line"></span><br><span class="line">//安装软件</span><br><span class="line">yum install glusterfs glusterfs-fuse glusterfs-server</span><br><span class="line"></span><br><span class="line">//创建挂载点</span><br><span class="line">mkdir -p /opt/vmx/gv0</span><br><span class="line"></span><br><span class="line">//client 挂载</span><br><span class="line">/bin/mount -t glusterfs 172.16.18.241:/gv0 /opt/vmx/gv0</span><br><span class="line"></span><br><span class="line">df -h</span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/centos-root   50G  5.6G   45G  12% /</span><br><span class="line">devtmpfs                  12G     0   12G   0% /dev</span><br><span class="line">tmpfs                     12G   12K   12G   1% /dev/shm</span><br><span class="line">tmpfs                     12G   25M   12G   1% /run</span><br><span class="line">tmpfs                     12G     0   12G   0% /sys/fs/cgroup</span><br><span class="line">/dev/mapper/centos-home  217G   33M  217G   1% /home</span><br><span class="line">/dev/sda1                497M  102M  395M  21% /boot</span><br><span class="line">/dev/sdb                 280G   33M  280G   1% /export/brick1</span><br><span class="line">172.16.18.241:/gv0         559G  1.6G  558G   1% /opt/vmx/gv0</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="管理使用-GlusterFS"><a href="#管理使用-GlusterFS" class="headerlink" title="管理使用 GlusterFS"></a>管理使用 GlusterFS</h2><h3 id="Gluster-节点管理"><a href="#Gluster-节点管理" class="headerlink" title="Gluster 节点管理"></a>Gluster 节点管理</h3><p>在创建 volume 之前需要先将一组存储设备组成一个存储池，通过存储设备提供的 bricks 来组成卷。在设备上启动 glusterd 之后，可通过设备的主机名或 IP 地址，将设备加到存储池中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gluster peer command</span><br></pre></td></tr></table></figure>
+<h4 id="节点状态"><a href="#节点状态" class="headerlink" title="节点状态"></a>节点状态</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 在任意节点操作，可以看到其他节点与本节点的连接状态</span><br><span class="line">gluster peer status</span><br><span class="line">Number of Peers: 3</span><br><span class="line">Hostname: 172.16.18.242</span><br><span class="line">Uuid: beb0aae7-a939-45ec-a273-0c21c2f59546</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.243</span><br><span class="line">Uuid: eab486b3-d1a1-4851-b9ec-45aab1ef9a66</span><br><span class="line">State: Peer in Cluster (Connected)</span><br><span class="line">Hostname: 172.16.18.244</span><br><span class="line">Uuid: 3108764d-d6b3-4356-810d-88872d56ceb6</span><br><span class="line">State: Peer in Cluster (Connected)</span><br></pre></td></tr></table></figure>
+<h4 id="添加节点"><a href="#添加节点" class="headerlink" title="添加节点"></a>添加节点</h4><p><strong>命令：<code>gluster peer HostName</code></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 将节点 server 添加到存储池中</span><br><span class="line">gluster peer prober server</span><br></pre></td></tr></table></figure>
+<h4 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h4><p><strong>命令： <code>gluster peer detach HostName</code></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 将节点 server 从存储池中移除，移除节点时要保证节点上没有 brick，需要提前移除 brick</span><br><span class="line">gluster peer detch server</span><br></pre></td></tr></table></figure>
+<p>gluster对于每个节点都会生成一个 UUID 来标识，因此如果节点的 IP 或主机名发生了变化，只需要重新执行 peer probe 即可。不过如果一个主机名曾经用过，想再改回去，则 gluster 会提示已经保存过。此时只能把节点 detach 掉，然后重新 probe。</p>
+<hr>
+<h3 id="Gluster-卷管理"><a href="#Gluster-卷管理" class="headerlink" title="Gluster 卷管理"></a>Gluster 卷管理</h3><p>Gluster 文件系统基于需求支持不同类型的卷类型。有些卷类型有益于扩展存储大小、一些可以提高性能、还有可以兼顾两者。</p>
+<h4 id="卷的类型"><a href="#卷的类型" class="headerlink" title="卷的类型"></a>卷的类型</h4><ul>
+<li><strong>Distributed Glusterfs Volume（分布卷）</strong></li>
+</ul>
+<p><img src="https://www.oneops.co/images/glusterfs/Distributed_Volume.png" alt="Distributed_Volume"></p>
+<p>这个是 GlusterFS 文件系统默认的卷类型，文件通过 hash 算法随机的分布到由bricks组成的卷上，因此不存在数据冗余。对于这样一个存储卷的优点是磁盘容量扩展强和使用率高。但是这也意味着一个 brick 损坏将导致数据丢失，除非 brick底层使用硬件 Raid 等外部冗余措施。</p>
+<ul>
+<li><strong>Replicated Glusterfs Volume（镜像卷、副本卷）</strong></li>
+</ul>
+<p><img src="https://www.oneops.co/images/glusterfs/Replicated_Volume.png" alt="Replicated_Volume"></p>
+<p>镜像卷类似raid1，解决了数据冗余问题，在创建时指定副本数量，副本在存储时会存放到不同 brick上， 因此，有几个复本就必须提供至少多个 brick。</p>
+<p><strong>注意：在创建复本卷时，brick 数量与复本个数必须相等；否则将会报错。另外如果同一个节点提供了多个 brick，也可以在同一个结点上创建复本卷，但这并不安全，因为一台设备挂掉，其上面的所有 brick 就无法访问了。</strong></p>
+<ul>
+<li><strong>Striped Glusterfs Volume（条带卷）</strong></li>
+</ul>
+<p><img src="https://www.oneops.co/images/glusterfs/Striped_Volume.png" alt="Striped_Volume"></p>
+<p>类似与 raid0，但是考虑一个大文件被存储在一个 brick，许多客户在同一时间经常访问。这将导致单个 brick 过多的负载并会降低性能。带区卷数据存储在砖后将它划分为不同的条纹，将大文件将被分为小块(等于 brick 的数量体积),每个块都存储在一个 brick。实现负载分布和文件可以获取更快读取速度，但不提供数据冗余。</p>
+<ul>
+<li><strong>Distributed Replicated Glusterfs Volume（分布式复制卷）</strong></li>
+</ul>
+<p><img src="https://www.oneops.co/images/glusterfs/Distributed_Replicated_Volume.png" alt="Distributed_Replicated_Volume"></p>
+<p>此类型卷是基本复本卷的扩展,兼顾分布卷和复制卷的功能。，可以指定若干 brick 组成一个复本卷，另外若干 brick 组成另个复本卷。单个文件在复本卷内数据保持复制，不同文件在不同复本卷之间进行分布。</p>
+<ul>
+<li><strong>Striped Glusterfs Volume（分布式条带卷）</strong></li>
+</ul>
+<p><img src="https://www.oneops.co/images/glusterfs/Distributed_Striped_Volume.png" alt="Distributed_Striped_Volume"></p>
+<p>volume 中 brick 所包含的存储服务器数必须是s tripe 的倍数(&gt;=2倍)，兼顾分布式和条带式的功能。</p>
+<ul>
+<li>其他拓展卷</li>
+</ul>
+<p><img src="https://www.oneops.co/images/glusterfs/Distributed_Striped_Replicated_Volume.png" alt="Distributed_Striped_Replicated_Volume" title="分布式镜像条带卷"></p>
+<p><img src="https://www.oneops.co/images/glusterfs/Striped_Replicated_Volume.png" alt="Striped_Replicated_Volume" title="条带镜像卷"></p>
+<hr>
+<h4 id="创建卷"><a href="#创建卷" class="headerlink" title="创建卷"></a>创建卷</h4><ul>
+<li>创建分布式卷(DHT)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// DHT 卷将数据以哈希计算方式分布到各个 brick上，数据是以文件为单位存取，基本达到分布均衡，提供的容量为各个 brick 的容量总和</span><br><span class="line">gluster volume create NEW-VOLNAME [transport [tcp | rdma | tcp,rdma]] NEW-BRICK...</span><br><span class="line">gluster volume create dht_vol 172.16.18.&#123;241,242,243,244&#125;:/export/brick1/gv0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建副本卷(AFR)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// AFR提供数据副本，副本数为 replica，即每个文件存储 replica 份数，文件不分割，以文件为存储单位：副本数需要等于brick数；当 brick 数是副本的倍数时，则自动变化为Replicated-Distributed卷</span><br><span class="line">gluster volume create NEW-VOLNAME [replica COUNT] [transport [tcp | rdma | tcp,rdma]] NEW-BRICK...</span><br><span class="line">gluster volume create afr_vol replica 2 [transport tcp] 172.16.18.&#123;241,242,243,244&#125;:/export/brick/gv0</span><br></pre></td></tr></table></figure>
+<p><strong>每两个 brick 组成一组，每组两个副本，文件又以DHT分布在三个组上，这样是副本卷和分布式卷的组合</strong></p>
+<ul>
+<li>创建条带卷</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//stripe卷类似raid0，将数据条带化，分布在不同的 brick，该方式将文件分块，将文件分成stripe块，分别进行存储，在大文件读取是有优势。stripe需要等于brick数；当brick数等于stripe数的倍数时，则自动变化为stripe-distributed卷。</span><br><span class="line">gluster volume create NEW-VOLNAME [stripe COUNT] [transport [tcp | dma | tcp,rdma]] NEW-BRICK...</span><br><span class="line">gluster volume create str_vol stripe 2 172.16.18.&#123;241,242,243,244&#125;:/export/brick1/gv0</span><br></pre></td></tr></table></figure>
+<p><strong>每2个 brick 组成一组，每组2个brick，文件以 DHT 分布在两个组中，每个组中将文件条带成2块</strong></p>
+<ul>
+<li>创建Replicated-Stripe-Distributed卷</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//使用 8 个 brick 创建一个组合卷，即brick数是 stripe*replica 的倍数，则创建三种基本卷的组合卷，若刚好等于 stripe*replica 则为 stript-Distrubted 卷</span><br><span class="line">gluster volume create str_afr_dht_vol stripe 2 replica 2 172.16.18.&#123;241,242,243,244&#125;:/export/brick1/gv0  172.16.18.&#123;241,242,243,244&#125;:/export/brick1/gv1</span><br></pre></td></tr></table></figure>
+<h4 id="卷信息"><a href="#卷信息" class="headerlink" title="卷信息"></a>卷信息</h4><p><strong>命令：gluster volume info</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// 该命令能够查看存储池中当前卷的信息，包括卷方式、包含的 brick、卷的当期状态、卷名及 UUID 等</span><br><span class="line">gluster volume info</span><br><span class="line"></span><br><span class="line">Volume Name: gv0</span><br><span class="line">Type: Distributed-Replicate</span><br><span class="line">Volume ID: e64cb61c-0f18-41b5-bf4d-c45ee085ca3b</span><br><span class="line">Status: Started</span><br><span class="line">Number of Bricks: 2 x 2 = 4</span><br><span class="line">Transport-type: tcp</span><br><span class="line">Bricks:</span><br><span class="line">Brick1: 172.16.18.241:/export/brick1/gv0</span><br><span class="line">Brick2: 172.16.18.242:/export/brick1/gv0</span><br><span class="line">Brick3: 172.16.18.243:/export/brick1/gv0</span><br><span class="line">Brick4: 172.16.18.244:/export/brick1/gv0</span><br><span class="line">Options Reconfigured:</span><br><span class="line">performance.readdir-ahead: on</span><br></pre></td></tr></table></figure>
+<h4 id="卷状态"><a href="#卷状态" class="headerlink" title="卷状态"></a>卷状态</h4><p><strong>命令： gluster volume status</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// 该命令能够查看当前卷的状态，包括其中各个 brick 的状态、NFS的服务状态及当前 task 执行情况和一些系统设置状态等</span><br><span class="line">gluster volume status</span><br><span class="line">Status of volume: gv0</span><br><span class="line">Gluster process                             TCP Port  RDMA Port  Online  Pid</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Brick 172.16.18.241:/export/brick1/gv0      49152     0          Y       1970</span><br><span class="line">Brick 172.16.18.242:/export/brick1/gv0      49152     0          Y       9547</span><br><span class="line">Brick 172.16.18.243:/export/brick1/gv0      49152     0          Y       1800</span><br><span class="line">Brick 172.16.18.244:/export/brick1/gv0      49152     0          Y       9741</span><br><span class="line">NFS Server on localhost                     N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on localhost               N/A       N/A        Y       2605</span><br><span class="line">NFS Server on 172.16.18.244                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.244           N/A       N/A        Y       15386</span><br><span class="line">NFS Server on 172.16.18.243                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.243           N/A       N/A        Y       1794</span><br><span class="line">NFS Server on 172.16.18.242                 N/A       N/A        N       N/A  </span><br><span class="line">Self-heal Daemon on 172.16.18.242           N/A       N/A        Y       1966</span><br><span class="line"></span><br><span class="line">Task Status of Volume gv0</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Task                 : Rebalance           </span><br><span class="line">ID                   : fad4f770-87dd-4248-b41e-733641c8bcca</span><br><span class="line">Status               : completed</span><br></pre></td></tr></table></figure>
+<h4 id="启动、停止卷"><a href="#启动、停止卷" class="headerlink" title="启动、停止卷"></a>启动、停止卷</h4><p><strong>命令： gluster volume start/stop VOLNAME</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 将创建的卷启动，才能进行客户端挂载；stop 能够将系统将停止；此外 gluster 并未提供 restart 的重启命令</span><br><span class="line">gluster volume start gv0</span><br><span class="line">volume create: gv0: success: please start the volume to access data</span><br></pre></td></tr></table></figure>
+<h4 id="删除卷"><a href="#删除卷" class="headerlink" title="删除卷"></a>删除卷</h4><p><strong>命令：gluster volume delete VOLNAME</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 删除卷的操作能够将整个卷删除，操作前需要将卷先停止</span><br><span class="line">gluster volume stop gv0</span><br><span class="line">gluster volume delete gv0</span><br></pre></td></tr></table></figure>
+<h4 id="均衡卷"><a href="#均衡卷" class="headerlink" title="均衡卷"></a>均衡卷</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">\\ 不迁移数据</span><br><span class="line">gluster volume gv0 rebalance fix-layout start</span><br><span class="line">gluster volume gv0 rebalance start</span><br><span class="line">gluster volume gv0 rebalance startforce</span><br><span class="line">gluster volume gv0 rebalance status</span><br><span class="line">gluster volume gv0 rebalance stop</span><br></pre></td></tr></table></figure>
+<h4 id="修复卷"><a href="#修复卷" class="headerlink" title="修复卷"></a>修复卷</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gluster volume heal mamm-volume #只修复有问题的文件  </span><br><span class="line">gluster volume heal mamm-volume full #修复所有文件  </span><br><span class="line">gluster volume heal mamm-volume info#查看自愈详情  </span><br><span class="line">gluster volume heal mamm-volume info healed|heal-failed|split-brain</span><br></pre></td></tr></table></figure>
+<p><strong>设置卷</strong></p>
+<p>命令：<code>gluster volume set options</code></p>
+<h4 id="设置卷传输端口类型"><a href="#设置卷传输端口类型" class="headerlink" title="设置卷传输端口类型"></a>设置卷传输端口类型</h4><ol>
+<li>Unmount the volume on all the clients using the following command</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount mount-point</span><br></pre></td></tr></table></figure>
+<ol>
+<li>Stop the volumes using the following command</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gluster volume stop volname</span><br></pre></td></tr></table></figure>
+<ol>
+<li>Change the transport type. For example, to enable both tcp and rdma execute the followimg command</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gluster volume set volname config.transport tcp,rdma OR tcp OR rdma</span><br></pre></td></tr></table></figure>
+<ol>
+<li>Mount the volume on all the clients. For example, to mount using rdma transport, use the following command</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t glusterfs -o transport=rdma server1:/test-volume /mnt/glusterfs</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Brick-管理"><a href="#Brick-管理" class="headerlink" title="Brick 管理"></a>Brick 管理</h3><h4 id="添加-brick"><a href="#添加-brick" class="headerlink" title="添加 brick"></a>添加 brick</h4><p><strong>命令：gluster volume add-brick VOLNAME NEW-BRICK</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//添加两个 brick 到存储 gv0，副本卷则要一次添加的 bricks 数是 replica 的整数倍；stripe 同样要求</span><br><span class="line">gluster peer probe 172.16.18.245</span><br><span class="line">gluster peer probe 172.16.18.246</span><br><span class="line">gluster volume add-brick gv0 172.16.18.245:/export/brick1/gv0  172.16.18.246:/export/brick1/gv0</span><br></pre></td></tr></table></figure>
+<h4 id="移除-brick"><a href="#移除-brick" class="headerlink" title="移除 brick"></a>移除 brick</h4><p><strong>命令： <code>gluster volume remove-brick VOLNAME BRICK start/status/commit</code></strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 若是副本卷，则要移除的 Brick 是 replica 的整数倍，stripe 具有同样的要求，副本卷要移除一对 Brick，在执行移除操作时，数据会移到其他节点。</span><br><span class="line">gluster volume remove-brick gv0 172.16.18.245:/export/brick1/gv0  172.16.18.246:/export/brick1/gv0 start</span><br><span class="line"></span><br><span class="line">// 在执行移除操作后，可以使用 status 命令进行 task 状态查看</span><br><span class="line">gluster volume remove-brick gv0 172.16.18.245:/export/brick1/gv0  172.16.18.246:/export/brick1/gv0 status</span><br><span class="line"></span><br><span class="line">// 使用 commit 命令执行 brick 移除，则不会进行数据迁移而直接删除 brick，符合不需要数据迁移的用户需求</span><br><span class="line">gluster volume remove-brick gv0 172.16.18.245:/export/brick1/gv0  172.16.18.246:/export/brick1/gv0 commit</span><br></pre></td></tr></table></figure>
+<p><strong>ps：系统的扩容及缩减可以通过如上的节点、brick 管理组合达到目的</strong> <strong>1. 扩容时，可以下增加系统节点，然后添加新增节点上的 brick 即可</strong> <strong>2. 缩减时，可以先移除 brick，然后在进行节点删除达到缩减的目的，并保证不丢失数据</strong></p>
+<h4 id="替换-brick"><a href="#替换-brick" class="headerlink" title="替换 brick"></a>替换 brick</h4><p>命令：<code>gluster volume replace-brick VOLNAME BRICKNEW-BRICK start/pause/sbort/status/commit</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 将 `172.16.18.244：/export/brick1/gv0` 替换为 `172.16.18.245:/export/brick1/gv0`。在执行 replcase-brick，使用 start 启动命令之后，开始将原始 brick 的数据迁移到即将需要替换的 brick 上</span><br><span class="line">gluster volume replace-brick gv0 172.16.18.244:/export/brick1/gv0  172.16.18.245:/export/brick1/gv0  start force</span><br><span class="line"></span><br><span class="line">//在数据迁移过程中，可以查看替换状态</span><br><span class="line">gluster volume replace-brick gv0 172.16.18.244:/export/brick1/gv0  172.16.18.245:/export/brick1/gv0  status</span><br><span class="line"></span><br><span class="line">// 在数据迁移的过程中，可以执行 abort 命令终止 brick 替换</span><br><span class="line">gluster volume replace-brick gv0 172.16.18.244:/export/brick1/gv0  172.16.18.245:/export/brick1/gv0 abort</span><br><span class="line"></span><br><span class="line">//当数据迁移结束之后，执行 commit 命令结束任务，则进行 brick 替换。使用 volume info 命令可以查看到 brick 已经被替换</span><br><span class="line">gluster volume replace-brick gv0 172.16.18.244:/export/brick1/gv0  172.16.18.245:/export/brick1/gv0  start</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="系统拓展"><a href="#系统拓展" class="headerlink" title="系统拓展"></a>系统拓展</h2><h3 id="系统配额"><a href="#系统配额" class="headerlink" title="系统配额"></a>系统配额</h3><h4 id="开启、关闭系统配额"><a href="#开启、关闭系统配额" class="headerlink" title="开启、关闭系统配额"></a>开启、关闭系统配额</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//在使用系统配额功能时，需要使用 enable 将其开启；disable为关闭命令</span><br><span class="line">gluster volume quota VOLNAME enable/disable</span><br></pre></td></tr></table></figure>
+<h4 id="设置目录配额"><a href="#设置目录配额" class="headerlink" title="设置目录配额"></a>设置目录配额</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gluster volume quota VOLNAME limit-usage /directory limit-value</span><br><span class="line"></span><br><span class="line">//设置gv0卷下 quota 子目录目录限额为 10GB，这个目录是以系统挂载目录为根目录，所以 /quota即客户端挂载目录下的子目录</span><br><span class="line">gluster volume quota gv0 limit-usage /quota 10GB</span><br></pre></td></tr></table></figure>
+<h4 id="配额查看"><a href="#配额查看" class="headerlink" title="配额查看"></a>配额查看</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gluster volume quota VOLNAME list</span><br><span class="line">gluster volume quota VOLNAME list /directory_name</span><br><span class="line">//可以使用上面命令查看卷的配额，第一个查看全部配额设置，第二个可以根据目录查看，显示配额大小及当前使用容量，如无使用容量则说明设置的目录有误(不存在)</span><br><span class="line">gluster volume quota gv0 list</span><br></pre></td></tr></table></figure>
+<h4 id="地域复制-geo-replication"><a href="#地域复制-geo-replication" class="headerlink" title="地域复制(geo-replication)"></a>地域复制(geo-replication)</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">gluster volume geo-replication MASTER SLAVE start/status/stop</span><br><span class="line"></span><br><span class="line">//地域复制是系统提供的灾备功能，能够将系统的全部数据进行异步的增量备份到另外的磁盘中</span><br><span class="line">gluster volume geo-replication gv0 172.16.18.250:/export/brick/gv0 start</span><br><span class="line"></span><br><span class="line">//当开始执行gv0卷的所有内容备份到18.250下的/export/brick/gv0中的task，值得注意的是，这个备份目标不能是系统中的brick</span><br></pre></td></tr></table></figure>
+<h4 id="I-O信息查看"><a href="#I-O信息查看" class="headerlink" title="I/O信息查看"></a>I/O信息查看</h4><p><code>profile command</code>提供了一个接口查看每个卷中的每个brick的io信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 启动profiling，之后便可以进行io查看</span><br><span class="line">gluster volume profile VOLNAME start</span><br><span class="line"></span><br><span class="line">// 查看io信息，可以查看到每个brick的io信息</span><br><span class="line">gluster volume profile VOLNAME info</span><br><span class="line"></span><br><span class="line">// 管理profilinig功能</span><br><span class="line">gluster volume profile VOLNAME stop</span><br></pre></td></tr></table></figure>
+<h4 id="top监控"><a href="#top监控" class="headerlink" title="top监控"></a>top监控</h4><p><code>top command</code>允许你查看 bricks 的性能，<code>read、write、file open calls、file read caclls、file write calls、directory open calls、directory read calls</code>。所有的查看都可以设置 top 数，默认是1000</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 查看打开的 fd</span><br><span class="line">gluster volume top VOLNAME open [brick BRICK-NAME] [list-cnt cnt]</span><br><span class="line"></span><br><span class="line">// 查看调用次数最多的读调用</span><br><span class="line">gluster volume top VOLNAME read [brick BRICK-NAME] [list-cnt cnt]</span><br><span class="line"></span><br><span class="line">// 查看调用次数最多的写调用</span><br><span class="line">gluster volume top VOLNAME write [brick BRICK-NAME] [list-cnt cnt]</span><br><span class="line"></span><br><span class="line">// 查看次数最多的目录调用</span><br><span class="line">gluster volume top opendir [brick BRICK-NAME] [list-cnt cnt]</span><br><span class="line">gluster volume top readdir [brick BRICK-NAME] [list-cnt cnt]</span><br><span class="line"></span><br><span class="line">//查看每个 brick 的读性能</span><br><span class="line">gluster volume top VOLNAME read-perf [bs blk-size count count] [brick BRICK-NAME] [list-cnt cnt]</span><br><span class="line"></span><br><span class="line">//查看每个 brick 的写性能</span><br><span class="line">gluster volume top VOLNAME write-perf [bs blk-size count count] [brick BRICK-NAME] [list-cnt cnt]</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="Glusterfs-冗余镜像（AFR）修复原理以及脑裂分析"><a href="#Glusterfs-冗余镜像（AFR）修复原理以及脑裂分析" class="headerlink" title="Glusterfs 冗余镜像（AFR）修复原理以及脑裂分析"></a>Glusterfs 冗余镜像（AFR）修复原理以及脑裂分析</h3><h4 id="什么是脑裂"><a href="#什么是脑裂" class="headerlink" title="什么是脑裂"></a>什么是脑裂</h4><p>所谓脑裂，就是指两个或多个节点都”认为”自身是正常节点而互相”指责”对方，导致不能选取正确的节点进行接管或修复，导致脑裂状态。这种现象出现在数据修复、集群管理等等高可用场景。Glusterfs 的冗余镜像（下文简称 AFR）提供了数据副本功能，能够在即使只有一个冗余节点的情况下仍能正常工作，不中断上层应用。当节点恢复后，能够将数据修复到一致状态，保证数据的安全。</p>
+<p><strong>AFR工作原理</strong></p>
+<p>AFR数据修复主要涉及三个方面：<code>ENTRY，META，DATA</code>，我们以冗余度为 2 即含有两个副本 A 和 B 的 DATA 修复为例进行讲解。记录描述副本状态的称之为 ChangeLog，记录在每个副本文件扩展属性里，读入内存后以矩阵形式判断是否需要修复以及要以哪个副本为 Source 进行修复。初始值以及正常值为 0.（注：ENTRY 和 META,DATA 分布对应着一个数值）。</p>
+<p>Write的步骤可分解为：</p>
+<ol>
+<li>下发 Write 操作</li>
+<li>加锁 Lock</li>
+<li>向 A，B 副本的 ChangeLog 分别加 1，记录到各个副本的扩展属性中</li>
+<li>对 A，B 副本进行写操作</li>
+<li>若该副本写成功则 ChangeLog 减 1，若该副本写失败则 ChangLog 值不变，记录到各个副本的扩展属性中</li>
+<li>解锁 UnLock</li>
+<li>向上层返回，只要有一个副本写成功就返回成功。</li>
+</ol>
+<p><strong>上述在AFR中是完整的一个 transaction 动作。根据两个副本记录的 ChangeLog 的数值确定了副本的几种状态：</strong></p>
+<ul>
+<li><p>WISE，智慧的，即该副本的 ChangeLog 中对方对应的数值大于0而且自身对应的数值等于0.</p>
+</li>
+<li><p>INNOCENT，无辜的，即该副本上的 ChangeLog 即不指责对方也指责自己，ChangeLog全为0.</p>
+</li>
+<li><p>FOOL，愚蠢的，即该副本上的 ChangeLog 是指责自己的。</p>
+</li>
+<li><p>IGNORANT，忽略的，即该副本的 ChangeLog 丢失。</p>
+</li>
+</ul>
+<p>所以一般情况下，会选取WISE的副本作为Sourse进行修复。但是当两个节点都是WISE状态时，这就出现了声名狼藉的脑裂状态。</p>
+<p><strong>AFR脑裂</strong></p>
+<p>两个副本均为 WISE 时发生脑裂，那么在哪种场景下会产生脑裂呢？我们还是以冗余度为2的情况举一个简单的例子：某文件 X 的两个副本位于物理机 A 和物理机 B 上，在 A 和 B 上分别运行着进程 a 和进程 b，a 和 b 持续通过各自所在的物理机上的客户端对文件 X 进行不同的写操作。然后物理机 A 和 B 之间网络中断，因为AFR在一个副本的情况下仍能不中断上层应用，所以进程a和进程b仍会持续运行，但因为网络中断，文 件X 在 A 和 B 上的副本数据不再一致且都认为对方是异常的，当网络恢复时，两个副本互相”指责”，即出现了脑裂。当然这是脑裂发生的场景之一，有时候是有可能发生脑裂，而有时候是必然发生脑裂。</p>
+<p><a href="http://gluster.readthedocs.org/en/latest/Troubleshooting/split-brain/" target="_blank" rel="noopener">官方提供解决方案</a></p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://gluster.readthedocs.org/en/latest/" target="_blank" rel="noopener">官方文档:http://gluster.readthedocs.org/en/latest/</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/glusterfs/" rel="tag"> <i class="fa fa-tag"></i> glusterfs</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+               <div>
+                 
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+               </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/19/install-glusterfs.html" rel="next" title="GlusterFS部署详解">
+                <i class="fa fa-chevron-left"></i> GlusterFS部署详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/10/consul-guide.html" rel="prev" title="Consul入门">
+                Consul入门 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjY0MS8xOTE4OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/blog/avatar.jpg" alt="Cc">
+            
+              <p class="site-author-name" itemprop="name">Cc</p>
+              <p class="site-description motion-element" itemprop="description">Love Linux ♥ Love Python. 猴赛雷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是-GlusterFS"><span class="nav-number">1.</span> <span class="nav-text">什么是 GlusterFS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GlusterFS-概述"><span class="nav-number">1.1.</span> <span class="nav-text">GlusterFS 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设计目标"><span class="nav-number">1.2.</span> <span class="nav-text">设计目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技术特点"><span class="nav-number">1.3.</span> <span class="nav-text">技术特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总体架构和设计"><span class="nav-number">1.4.</span> <span class="nav-text">总体架构和设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#弹性哈希算法"><span class="nav-number">1.5.</span> <span class="nav-text">弹性哈希算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Translators"><span class="nav-number">1.6.</span> <span class="nav-text">Translators</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设计讨论"><span class="nav-number">1.7.</span> <span class="nav-text">设计讨论</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用-GlusterFS"><span class="nav-number">2.</span> <span class="nav-text">使用 GlusterFS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#术语解释"><span class="nav-number">2.1.</span> <span class="nav-text">术语解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-GlusterFS"><span class="nav-number">2.2.</span> <span class="nav-text">安装 GlusterFS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#系统环境介绍"><span class="nav-number">2.2.1.</span> <span class="nav-text">系统环境介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-GlusterFS-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">安装 GlusterFS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装软件包"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">安装软件包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置开机启动"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">配置开机启动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-GlusterFS-集群"><span class="nav-number">2.3.</span> <span class="nav-text">配置 GlusterFS 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加节点到-GlusterFS-集群"><span class="nav-number">2.3.1.</span> <span class="nav-text">添加节点到 GlusterFS 集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建数据存储目录"><span class="nav-number">2.3.2.</span> <span class="nav-text">创建数据存储目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-GlusterFS-磁盘卷"><span class="nav-number">2.3.3.</span> <span class="nav-text">创建 GlusterFS 磁盘卷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装客户端并-mount-GlusterFS-文件系统"><span class="nav-number">2.3.4.</span> <span class="nav-text">安装客户端并 mount GlusterFS 文件系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理使用-GlusterFS"><span class="nav-number">2.4.</span> <span class="nav-text">管理使用 GlusterFS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Gluster-节点管理"><span class="nav-number">2.4.1.</span> <span class="nav-text">Gluster 节点管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#节点状态"><span class="nav-number">2.4.1.1.</span> <span class="nav-text">节点状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#添加节点"><span class="nav-number">2.4.1.2.</span> <span class="nav-text">添加节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除节点"><span class="nav-number">2.4.1.3.</span> <span class="nav-text">删除节点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gluster-卷管理"><span class="nav-number">2.4.2.</span> <span class="nav-text">Gluster 卷管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#卷的类型"><span class="nav-number">2.4.2.1.</span> <span class="nav-text">卷的类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建卷"><span class="nav-number">2.4.2.2.</span> <span class="nav-text">创建卷</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卷信息"><span class="nav-number">2.4.2.3.</span> <span class="nav-text">卷信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卷状态"><span class="nav-number">2.4.2.4.</span> <span class="nav-text">卷状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动、停止卷"><span class="nav-number">2.4.2.5.</span> <span class="nav-text">启动、停止卷</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除卷"><span class="nav-number">2.4.2.6.</span> <span class="nav-text">删除卷</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#均衡卷"><span class="nav-number">2.4.2.7.</span> <span class="nav-text">均衡卷</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修复卷"><span class="nav-number">2.4.2.8.</span> <span class="nav-text">修复卷</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置卷传输端口类型"><span class="nav-number">2.4.2.9.</span> <span class="nav-text">设置卷传输端口类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Brick-管理"><span class="nav-number">2.4.3.</span> <span class="nav-text">Brick 管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#添加-brick"><span class="nav-number">2.4.3.1.</span> <span class="nav-text">添加 brick</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#移除-brick"><span class="nav-number">2.4.3.2.</span> <span class="nav-text">移除 brick</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#替换-brick"><span class="nav-number">2.4.3.3.</span> <span class="nav-text">替换 brick</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统拓展"><span class="nav-number">2.5.</span> <span class="nav-text">系统拓展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#系统配额"><span class="nav-number">2.5.1.</span> <span class="nav-text">系统配额</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#开启、关闭系统配额"><span class="nav-number">2.5.1.1.</span> <span class="nav-text">开启、关闭系统配额</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置目录配额"><span class="nav-number">2.5.1.2.</span> <span class="nav-text">设置目录配额</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配额查看"><span class="nav-number">2.5.1.3.</span> <span class="nav-text">配额查看</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#地域复制-geo-replication"><span class="nav-number">2.5.1.4.</span> <span class="nav-text">地域复制(geo-replication)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#I-O信息查看"><span class="nav-number">2.5.1.5.</span> <span class="nav-text">I/O信息查看</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#top监控"><span class="nav-number">2.5.1.6.</span> <span class="nav-text">top监控</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Glusterfs-冗余镜像（AFR）修复原理以及脑裂分析"><span class="nav-number">2.5.2.</span> <span class="nav-text">Glusterfs 冗余镜像（AFR）修复原理以及脑裂分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是脑裂"><span class="nav-number">2.5.2.1.</span> <span class="nav-text">什么是脑裂</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">2.6.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cc</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2017/12/19/glusterfs.html'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
+</body>
+</html>

@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="什么是Consul Consul 是由HashiCorp开发，官方网站：https://www.consul.io/ 特点 让服务发现和配置管理更加容易 分布式、高可用、跨数据中心   详解 服务发现  consul 让服务注册和服务发现（通过 DNS 和 HTTP 接口）更加方便，甚至对于外部服务注册也是一样  故障检测  通过健康检查，服务发现可以防止请求被路由到不健康的主机，并且可以是服务容">
+<meta name="keywords" content="consul">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Consul入门">
+<meta property="og:url" content="https://www.oneops.co/2018/01/10/consul-guide.html">
+<meta property="og:site_name" content="Cc&#39;s Blog">
+<meta property="og:description" content="什么是Consul Consul 是由HashiCorp开发，官方网站：https://www.consul.io/ 特点 让服务发现和配置管理更加容易 分布式、高可用、跨数据中心   详解 服务发现  consul 让服务注册和服务发现（通过 DNS 和 HTTP 接口）更加方便，甚至对于外部服务注册也是一样  故障检测  通过健康检查，服务发现可以防止请求被路由到不健康的主机，并且可以是服务容">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.oneops.co/images/consul/consul.jpg">
+<meta property="og:image" content="https://www.oneops.co/images/consul/atlas_workflow.png">
+<meta property="og:updated_time" content="2019-05-20T06:57:34.990Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Consul入门">
+<meta name="twitter:description" content="什么是Consul Consul 是由HashiCorp开发，官方网站：https://www.consul.io/ 特点 让服务发现和配置管理更加容易 分布式、高可用、跨数据中心   详解 服务发现  consul 让服务注册和服务发现（通过 DNS 和 HTTP 接口）更加方便，甚至对于外部服务注册也是一样  故障检测  通过健康检查，服务发现可以防止请求被路由到不健康的主机，并且可以是服务容">
+<meta name="twitter:image" content="https://www.oneops.co/images/consul/consul.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.oneops.co/2018/01/10/consul-guide.html">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Consul入门 | Cc's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=71693959-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '71693959-4');
+</script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Cc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">生命不止 学习不息</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2018/01/10/consul-guide.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Consul入门
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-01-10 07:05:31" itemprop="dateCreated datePublished" datetime="2018-01-10T07:05:31+08:00">2018-01-10</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-05-20 14:57:34" itemprop="dateModified" datetime="2019-05-20T14:57:34+08:00">2019-05-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="什么是Consul"><a href="#什么是Consul" class="headerlink" title="什么是Consul"></a>什么是Consul</h1><p><img src="https://www.oneops.co/images/consul/consul.jpg" alt="consul"> Consul 是由<a href="https://www.hashicorp.com/" target="_blank" rel="noopener">HashiCorp</a>开发，<a href="https://www.consul.io/" target="_blank" rel="noopener">官方网站：https://www.consul.io/</a></p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><ul>
+<li>让服务发现和配置管理更加容易</li>
+<li>分布式、高可用、跨数据中心</li>
+</ul>
+<hr>
+<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><ul>
+<li>服务发现</li>
+</ul>
+<p><code>consul</code> 让服务注册和服务发现（通过 DNS 和 HTTP 接口）更加方便，甚至对于外部服务注册也是一样</p>
+<ul>
+<li>故障检测</li>
+</ul>
+<p>通过健康检查，服务发现可以防止请求被路由到不健康的主机，并且可以是服务容易断开（不再提供服务）</p>
+<ul>
+<li>多数据中心</li>
+</ul>
+<p><code>consul</code> 不需要复杂的配置即可简单的扩展到多个数据中心，查找其他数据中心的服务或者只请求 当前数据中心服务</p>
+<a id="more"></a>
+<hr>
+<ul>
+<li>DNS 查询接口</li>
+</ul>
+<p>使用 <code>Consul</code> 内置的 <code>DNS server</code>查找服务，支持现有的基础设置二不需要任何代码上的修改</p>
+<ul>
+<li>键值存储</li>
+</ul>
+<p><code>Consul</code> 提供一个分层的键值存储，通过一个简单的<code>HTTP API</code>进行访问，管理配置从来没有如此简单</p>
+<h1 id="Consul-与其他软件的对比"><a href="#Consul-与其他软件的对比" class="headerlink" title="Consul 与其他软件的对比"></a>Consul 与其他软件的对比</h1><p><code>Consul</code> 解决的问题有多个，但是每一个问题都已经被许多不同的系统解决。虽然没有一个单个的 系统提供<code>Consul</code>的所有功能，但是有其他选择来解决其中的问题。</p>
+<h2 id="CONSUL-VS-ZOOKEEPER-DOOZERD-ETCD"><a href="#CONSUL-VS-ZOOKEEPER-DOOZERD-ETCD" class="headerlink" title="CONSUL VS. ZOOKEEPER, DOOZERD, ETCD"></a>CONSUL VS. ZOOKEEPER, DOOZERD, ETCD</h2><blockquote>
+<p>ZooKeeper、doozerd和etcd有着相似的架构，这三个都有Server节点，并且需要一个法定的多数（通常是简单多数）节点才能进行运转。他们是强一致性的，并且开放多种基本操作，使用这些操作编写成Client库，集成到应用中来构建复杂的分布式系统。 Consul也需要Server节点。在每个数据中心，Consul都需要一个法定的数目的Server节点来控制和提供强一致性。然而，Consul原生支持多数据中心，并且有一个用于连接Server和Client节点的功能丰富的流言系统。 这些系统在提供键值存储方面都有大致相同的语义：读是强一致的，并且在面对网络分区时可用性要为保证一致性做出牺牲。然而当这些系统被应用于一些高级场景时，其和Consul的差异将变的更为明显。 这些系统提供的语义对于服务发现是很有吸引力的，但是很重要的需要强调的是这些功能必须自己构建。ZooKeeper以及其它的软件仅仅提供了一个原始的键值存储功能，需要应用开发者构建他们自己的系统来提供服务发现。和它们比起来，Consul专门提供了一个框架用于服务发现，消除了空头支票和开发计划。Client简单地注册服务，然后使用DNS或者HTTP接口进行服务发现。其它的系统则需要一个自己定制的解决方案。 一个值得信赖的服务发现框架必须包含健康检查，以及可能的故障检测。对于节点A上的Foo Service，如果节点已经挂了或者服务已经崩溃了，那么知道这个服务的存在没有什么用处。朴素的（简单的）系统一般可以使用心跳、周期性的更新和TTLs等方案来实现此功能。这些方案需要工作在线性增长的节点，并要求一组固定数量的Server。另外，故障检测窗口至少要像TTL一样长。 ZooKeeper的临时节点，作为键值条目存在，当客户端连接断开时条目被删除。这比一个心跳系统更为精密，但是也会带来扩展性问题，并增加客户端的复杂性。所有的客户端必须保持到ZooKeeper Server的活动连接，并进行keep-alives。另外，这将导致”胖客户端”，程序难以编写并经常导致调试风险。 Consul使用一个非常不同的架构来进行健康检查。除了Server节点，Consul Client运行在集群的每一个节点。这些Client是流言池的一部分，流言池提供一些功能，包括分布式的健康检查。流言协议实现了一个高效的故障检测，可以扩展到一个任意数量的集群，而不集中工作在一个选定的Server组。Client也可以在本地运行一套丰富的的健康检查，反之ZooKeeper临时节点是一个非常原始的活跃度检查。使用Consul，Client可以检查一个Web服务是否返回200状态码，内存使用是否危急，是否有足够的磁盘空间，等等。Consul客户端开放一个简单的HTTP接口，并且避免像ZooKeeper一样将系统的复杂性暴露给客户端。 Consul提供了优秀的服务发现、健康检查、键值存储和多数据中心支持。其它系统为了提供比简单的键值存储更多的功能，需要在其上增加另外的工具或库。在Client节点，Consul仅需要一个瘦客户端提供一个简单的API。此外，通过配置文件和DNS接口可以实现一个完整的服务发现方案，可以完全避免使用API，从而不用进行任何开发工作。</p>
+</blockquote>
+<h2 id="CONSUL-VS-CHEF-PUPPET-ETC"><a href="#CONSUL-VS-CHEF-PUPPET-ETC" class="headerlink" title="CONSUL VS. CHEF, PUPPET, ETC."></a>CONSUL VS. CHEF, PUPPET, ETC.</h2><blockquote>
+<p>很多人在使用Chef、Puppet，以及其它配置管理工具构建服务发现机制，这种机制通常在一个周期性收敛运行的过程中通过全局状态查询在每个节点上生成配置文件。 不幸的是，这个方式（途径）有一些陷阱。配置信息是静态的，并且不能比收敛运行更频繁的进行更新，一般更新会间隔许多分钟或小时。此外，没有机制让系统的状态包含在配置中：不健康的节点接收访问可能使问题更加恶化。使用此方式还会带来支持多数据中心的挑战：一组中央服务器必须管理所有的数据中心（译者注：Chef、Puppet通过Server管理所有Client）。 Consul被明确地设计为一个服务发现工具。因此，它对于集群的状态提供更多的动态性和便捷性。节点可以注册和注销它们提供的服务，可以依赖应用和服务快速地发现其它所有提供者。通过集成的健康检查，Consul可以使路由访问远离不健康的节点，从而允许系统和服务优雅的恢复。原来由配置管理工具提供的静态配置可以转移到动态的键值存储。这允许应用配置可以不用再通过一个缓慢的收敛运行进行更新。最后，由于每一个数据中心独立运行，支持多数据中心不再比单个数据中心更加困难。 不过，Consul不是用来代替配置管理工具的。这些工具对于安装应用还是很重要的，包括Consul自己。静态配置最好通过现有的管理工具，动态状态和发现通过Consul进行管理更好。分离配置管理和集群管理也会带来一些有利的副作用：没有全局状态，Chef recipes和Puppet manifests变的更简单；周期性的运行不再需要关心服务和配置变更；因为配置管理运行不需要全局状态，则基础设施无需改变（译者注：不需要维护全局状态，则不需要改变配置管理工具）</p>
+</blockquote>
+<h2 id="CONSUL-VS-NAGIOS-SENSU"><a href="#CONSUL-VS-NAGIOS-SENSU" class="headerlink" title="CONSUL VS. NAGIOS, SENSU"></a>CONSUL VS. NAGIOS, SENSU</h2><blockquote>
+<p>Nagios和Sensu都被构建为监控工具，用于当问题发生时快速的通知运维人员。 Nagios使用一组被配置为在远程主机执行检查任务的中央服务器。这个设计使它难以扩展，因为大型集群会迅速达到垂直尺度的限制，而Nagios自身也不能容易的进行水平扩展。众所周知，Nagios很难与现代的DevOps和配置管理工具配合使用，因为当远程服务器添加或移除时，主机上的配置必须被更新（不能自动发现）。 Sensu有更多的现代设计，它依赖本地Agent运行检查，然后将结果推送到一个AMQP Broker。若干服务器从Broker接收并处理健康检查的结果。这个模型比Nagios具有更多的可伸缩性，因为它允许更多的水平伸缩，并且Agent和Server之间是弱耦合的。然而，中心Broker有伸缩的限制，并且是系统中的单一故障点。 Consul提供了像Nagios和Sensu一样的健康检查能力，并且对现代的DevOps友好，避免了其它系统固有的伸缩性问题。Consul在本地运行所有的检查，就像Sensu一样，避免把负载全放到中央服务器（译者注：避免把鸡蛋放到一个篮子里:-)）。Consul Server维护检查的状态，它具有一定的故障容忍度，并且没有单点故障。最后，Consul可以扩大到更多的检查数量，因为它依靠边界触发更新。这意味着，仅当一个检查状态从”passing”转换为”faling”或者反过来的时候，才会触发更新。 在一个大型集群，大多数的检查都是passing状态，也可能存在少量的检查一直是failing状态。通过仅捕获状态改变，Consul减少了大量的网络通信，以及健康检查的计算资源，允许系统提供更多的可伸缩性。 敏锐的读者可能注意到，如果一个Consul Agent挂了，将不会有边界触发更新的事发生。从其它节点看，所有的健康检查将呈现为一个不变的稳定的状态。然而，Consul守护进程也会处理这个问题。Client和Server使用的流言协议集成了一个分布式的故障检测器。这意味着如果一个Consul Agent挂了，故障将被检测到，于是这个节点上运行的所有健康检查将被认为失败。同时故障检测器在整个集群分发这个工作，更重要的是，使边界触发架构运作起来。</p>
+</blockquote>
+<h2 id="CONSUL-VS-SKYDNS"><a href="#CONSUL-VS-SKYDNS" class="headerlink" title="CONSUL VS. SKYDNS"></a>CONSUL VS. SKYDNS</h2><blockquote>
+<p>SkyDNS是一个提供服务发现的工具。它使用多个具有强一致性和故障容错的中心服务器。节点使用HTTP API进行服务注册，通过HTTP或DNS查询进行服务发现。 Consul非常相似，但提供了这些功能的一个超集。Consul也依赖于多个中央服务器提供强一致性和故障容错。节点可以使用HTTP API或使用Agent进行服务注册，通过HTTP或DNS进行查询。 然而，它们在许多方面有所不同。Consul提供了更为丰富的健康检查框架，支持任意检查和高伸缩性的故障检测。SkyDNS依赖普通的心跳和TTL，这个方法存在出了名的伸缩性问题。此外，相对Consul执行的丰富的健康检查，SkyDNS的心跳只提供一个有限的存活度检查。 SkyDNS通过使用”regions”来支持多数据中心。然而，数据只能被一个集群管理和查询。如果服务器分隔在不同的数据中心，复制协议将要容忍非常长的提交时间。如果所有的SkyDns服务器都在一个中央数据中心，连通性问题将导致整个数据中心失去可用性。此外，即时不存在连通性问题，因为请求必须在远程数据中心执行，查询性能也是个问题。 Consul非常好的支持多数据中心，它专门将管理的数据控制在每个数据中心的范围。这意味着每个数据中心运行一个独立的Server集群。如果需要的话，请求直接指向远程数据中心；一个数据中内的服务请求绝不会通过WAN，并且不同数据中心间的连接性问题也不会影响同一个数据中心内的可用性。此外，一个数据中心内的不可用也不会影响其他数据中心服务的服务发现功能。</p>
+</blockquote>
+<h2 id="CONSUL-VS-SMARTSTACK"><a href="#CONSUL-VS-SMARTSTACK" class="headerlink" title="CONSUL VS. SMARTSTACK"></a>CONSUL VS. SMARTSTACK</h2><blockquote>
+<p>SmartStack是一个处理服务发现问题的工具。它有一个相当独特的架构，有4个主要的组件：ZooKeeper, HAProxy, Synapse, and Nerve。ZooKeeper负责存储集群状态，以一致性的和故障容错的方式。Nerve和Synapse运行在SmartStack集群中的每个节点。Nerve负责对服务进行健康检查，并注册到ZooKeeper服务器（译者注：创建ZooKeeper临时节点）。Synapse为服务提供者查询ZooKeeper，动态的配置HAProxy。最后，客户端与HAProxy通信，HAProxy进行健康检查，并处理服务多份部署之间的负载均衡。 Consul是一个非常简单但功能丰富的系统，并且它不依赖于任何其它组件。Consul集成流言协议来跟踪所有的节点，并进行服务器发现。这意味着服务器地址不需要硬编码，并且变化时不需要更新整个集群，这和SmartStack是不同的。 Consul和Nerves都可以通过配置文件进行服务注册，但是Consul也支持通过API动态的改变正在使用的服务和检查。 对于服务发现，SmartStack客户端必须使用HAProxy，需要Synapse预先配置所有需要的节点。Consul客户端使用DNS或HTTP API，而不用任何预先配置。Consul还提供一个Tag概念，允许服务提供元数据如版本、主/副名称，或者其它指定的符号，用于过滤服务。客户端可以仅请求匹配指定Tag的服务。 在管理健康检查方面SmartStack和Consul也是不同的。Nerve和Consul Agent以类似的方式执行本地健康检查。然而，Consul维护隔离的目录和健康系统。这个区分允许运维人员可以看到每个服务池中有哪些节点，以及哪些节点是检查失败的。Nerve当检查失败时只是简单的注销节点，提供有限的运维洞察力。Synapse还通过配置HAProxy进行另外的健康检查。这导致所有潜在的服务客户端都会进行活跃度检查。在一个大的集群中，这种N-to-N风格的健康检查可能代价过高。 总的来说Consul提供了一个非常丰富的健康检查系统。Consul支持Nagios风格式的插件，支持巨大的检查目录。Consul允许服务和主机级别的检查。Consul甚至提供一个”死人键”检查，以允许应用可以容易的整合自定义健康检查。最终，所有这些整合到一个健康和目录系统，运维人员通过API可以洞察更广泛的系统。 除了服务发现和健康检查，Consul还为配置管理提供一个键值存储，并支持多数据中心。如果配置SmartStack支持多数据中心，中央ZooKeeper集群对于故障容错部署可能是一个严重的妨碍。</p>
+</blockquote>
+<h2 id="CONSUL-VS-SERF"><a href="#CONSUL-VS-SERF" class="headerlink" title="CONSUL VS. SERF"></a>CONSUL VS. SERF</h2><blockquote>
+<p>Serf是一个节点发现和协调工具，它是目前为止我们讨论的唯一基于最终一致性的流言协议模型构建的，不需要集中式部署服务器。它提供一系列的功能，包括组成员、故障检测、事件广播，以及一个查询机制。然而，Serf不提供任何高级功能，比如服务发现、健康检查或者键值存储。Consul是一个提供所有这个功能的完整系统。 实际上Consul内部使用的流言协议是由Serf类库支持的：Consul在其成员管理和故障检测功能之上来构建服务发现。相比Serf的发现功能在节点级别，Consul提供服务和节点级别的发现功能。 Serf提供的健康检查非常低级，仅标识Agent是否活着。Consul在此基础上提供了一个丰富的健康检查系统，可以处理任意主机和服务级别的活跃度检查；健康检查集成一个中央目录，运维人员可以容易的查询，并获取对集群的洞察力。 Serf提供的成员管理在节点级别；Consul聚焦在服务级别，单个节点映射到多个服务。Serf可以使用标签进行模仿，但是它有很多限制，并且不能提供有用的查询接口。Consul还使用一个强一致性目录，而Serf仅是最终一致性。 除了服务级别抽象和健康检查的提升，Consul还提供一个键值存储，并支持多数据中心。Serf可以在WAN环境下运行，但是会降低性能。Consul使用多个流言池，所以使用它连接WAN环境的多个数据中心的情况下，Serf在LAN环境的性能可以保持。 Consul用法相对固定，而Serf是一个更加灵活和通用的工具。在CAP理论中，Consul使用CP架构，强调一致性超过可用性。Serf是一个AP系统，牺牲一致性保证可用性。这意味着几乎所有的情况下如果中央服务器不能达到法定数目，Consul将不能运行，而Serf将继续运作。</p>
+</blockquote>
+<h2 id="CONSUL-VS-CUSTOM-SOLUTIONS"><a href="#CONSUL-VS-CUSTOM-SOLUTIONS" class="headerlink" title="CONSUL VS. CUSTOM SOLUTIONS"></a>CONSUL VS. CUSTOM SOLUTIONS</h2><blockquote>
+<p>随着代码库的增长，一个单体应用经常演化为面向服务的架构（SOA）。SOA的一个普遍痛点是服务发现和配置管理。在许多情况下，这导致组织构建自己的解决方案。一个无可争辩的事实是分布式系统是困难的；构建它容易出错且耗费时间。大部分系统图省事经常会引入一个单点故障比如：单个Redis或RDBMS来维护集群状态。这些解决方案可能仅短时间内有效，并且罕有故障容错或伸缩性。除了这些限制，人们还需要时间和资源来构建和维护这些系统。 Consul开箱即用的提供了SOA需要的核心功能集。通过使用Consul，组织可以利用开源工作来减少时间和重复发明轮子的努力，可以将将精力集中于他们的业务应用。 Consul基于广泛引用的研究，并充分考虑分布式系统的限制进行设计。在每一步，Consul都努力为任何规模的组织提供一个稳健和可伸缩的解决方案。</p>
+</blockquote>
+<h1 id="Consul和HashiCorp生态"><a href="#Consul和HashiCorp生态" class="headerlink" title="Consul和HashiCorp生态"></a>Consul和HashiCorp生态</h1><p>HashiCorp是开源项目Vagrant、Packer、Terraform、Serf和Consul，以及商业产品Atlas的创建者。HashiCorp构建了用于应用交付版本、可审计的、可重复的、协作的过程，Consul只是这个生态系统中的其中一件。要了解更多关于我们对现代数据中心能力和应用尽责交付的观点，请阅读Atlas思维方式：<a href="https://www.hashicorp.com/blog/atlas-mindset.html?utm_source=consul&amp;utm_campaign=HashicorpEcosystem" target="_blank" rel="noopener">基础设施的版本控制</a>。</p>
+<p>如果你正在使用Consul做服务发现，那么很有可能你有一个工具用来部署Consul将要连接的基础设施。Terraform是我们用于创建、结合，以及修改基础设施的这样一个工具。</p>
+<p>下面是HashiCorp开源项目的简要介绍，并通过一个图形化的方式来展示Atlas如何连接他们来创建一个完整的应用交付流程。 <img src="https://www.oneops.co/images/consul/atlas_workflow.png" alt="work-flow"></p>
+<p>Atlas是HashiCorp的唯一商业产品。它联合Packer、Terraform和Consul使应用交付成为一个版本化的、可审计的、可重复的、协作的过程。</p>
+<p>Packer是HashiCorp用来创建机器镜像、可部署工件如AMIs、OpenStack镜像、Docker容器等等的工具。</p>
+<p>Terraform是HashiCorp用来创建、结合，以及修改基础设施的工具。在Atlas流程中Terraform读取工件注册表，然后据此提供基础设施。</p>
+<p>Consul是HashiCorp用来进行服务发现、服务注册和健康检查的工具。在Atlas流程中Consul在Packer构造阶段被配置，然后识别包含在每一个工件中的服务。因为Consul在Packer构造阶段被配置，当工件被Terraform部署时，它已经有完整的准备好的依赖和服务发现配置。这大大降低了生产环境中由于运行时配置失败产生的不健康节点的风险。</p>
+<p>Serf是hashiCorp用于集群成员管理和故障检测的工具。Consul使用Serf的流言协议作为服务发现的基础。</p>
+<p>Vagrant是HashiCorp用来管理映射生产环境的开发环境的工具。Vagrant环境可以减少开发一个项目的冲突，减少部署后出现意外行为的风险。 Vagrant Box可以和Packer生产环境工件同时构建以保持开发和生产环境对等。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/consul/" rel="tag"> <i class="fa fa-tag"></i> consul</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+               <div>
+                 
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+               </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/19/glusterfs.html" rel="next" title="GlusterFS技术详解">
+                <i class="fa fa-chevron-left"></i> GlusterFS技术详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/10/use-consul.html" rel="prev" title="Consul使用">
+                Consul使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjY0MS8xOTE4OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/blog/avatar.jpg" alt="Cc">
+            
+              <p class="site-author-name" itemprop="name">Cc</p>
+              <p class="site-description motion-element" itemprop="description">Love Linux ♥ Love Python. 猴赛雷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是Consul"><span class="nav-number">1.</span> <span class="nav-text">什么是Consul</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#特点"><span class="nav-number">1.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#详解"><span class="nav-number">1.2.</span> <span class="nav-text">详解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Consul-与其他软件的对比"><span class="nav-number">2.</span> <span class="nav-text">Consul 与其他软件的对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CONSUL-VS-ZOOKEEPER-DOOZERD-ETCD"><span class="nav-number">2.1.</span> <span class="nav-text">CONSUL VS. ZOOKEEPER, DOOZERD, ETCD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONSUL-VS-CHEF-PUPPET-ETC"><span class="nav-number">2.2.</span> <span class="nav-text">CONSUL VS. CHEF, PUPPET, ETC.</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONSUL-VS-NAGIOS-SENSU"><span class="nav-number">2.3.</span> <span class="nav-text">CONSUL VS. NAGIOS, SENSU</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONSUL-VS-SKYDNS"><span class="nav-number">2.4.</span> <span class="nav-text">CONSUL VS. SKYDNS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONSUL-VS-SMARTSTACK"><span class="nav-number">2.5.</span> <span class="nav-text">CONSUL VS. SMARTSTACK</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONSUL-VS-SERF"><span class="nav-number">2.6.</span> <span class="nav-text">CONSUL VS. SERF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONSUL-VS-CUSTOM-SOLUTIONS"><span class="nav-number">2.7.</span> <span class="nav-text">CONSUL VS. CUSTOM SOLUTIONS</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Consul和HashiCorp生态"><span class="nav-number">3.</span> <span class="nav-text">Consul和HashiCorp生态</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cc</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2018/01/10/consul-guide.html'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
+</body>
+</html>

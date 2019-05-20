@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="elasticsearch 性能提升可以通过下面几种方式  集群规划 存储策略 索引拆分 压缩 冷热分区  集群规划在 elasticsearch 集群中有两种角色，Master Node 和 Data Node，其他例如 tribe Node 节点可根据业务需要另行设定。为了让集群有更好的性能表现，应该对角色有更好的规划，在 Node 之间做读取分离，保证集群的稳定性和快速响应，在大规模的数据存">
+<meta name="keywords" content="elasticstack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch性能提升方案">
+<meta property="og:url" content="https://www.oneops.co/2019/04/09/elasticsearch-performance-improvement.html">
+<meta property="og:site_name" content="Cc&#39;s Blog">
+<meta property="og:description" content="elasticsearch 性能提升可以通过下面几种方式  集群规划 存储策略 索引拆分 压缩 冷热分区  集群规划在 elasticsearch 集群中有两种角色，Master Node 和 Data Node，其他例如 tribe Node 节点可根据业务需要另行设定。为了让集群有更好的性能表现，应该对角色有更好的规划，在 Node 之间做读取分离，保证集群的稳定性和快速响应，在大规模的数据存">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.oneops.co/images/elk/elasticsearch-norouting.jpg">
+<meta property="og:image" content="https://www.oneops.co/images/elk/elasticsearch-routing.jpg">
+<meta property="og:image" content="https://www.oneops.co/images/elk/elasitcsearch-hotwarn.jpg">
+<meta property="og:image" content="https://www.oneops.co/images/elk/elasticsearch-indexisolation.jpg">
+<meta property="og:image" content="https://www.oneops.co/images/elk/elasticsearch-clusters.jpg">
+<meta property="og:image" content="https://www.oneops.co/images/elk/elasticsearch-tribenode.jpg">
+<meta property="og:image" content="https://www.oneops.co/images/elk/elasticsearch-crosscluster.jpg">
+<meta property="og:updated_time" content="2019-05-20T06:57:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="elasticsearch性能提升方案">
+<meta name="twitter:description" content="elasticsearch 性能提升可以通过下面几种方式  集群规划 存储策略 索引拆分 压缩 冷热分区  集群规划在 elasticsearch 集群中有两种角色，Master Node 和 Data Node，其他例如 tribe Node 节点可根据业务需要另行设定。为了让集群有更好的性能表现，应该对角色有更好的规划，在 Node 之间做读取分离，保证集群的稳定性和快速响应，在大规模的数据存">
+<meta name="twitter:image" content="https://www.oneops.co/images/elk/elasticsearch-norouting.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.oneops.co/2019/04/09/elasticsearch-performance-improvement.html">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>elasticsearch性能提升方案 | Cc's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=71693959-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '71693959-4');
+</script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Cc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">生命不止 学习不息</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/04/09/elasticsearch-performance-improvement.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">elasticsearch性能提升方案
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-09 18:00:00" itemprop="dateCreated datePublished" datetime="2019-04-09T18:00:00+08:00">2019-04-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-05-20 14:57:35" itemprop="dateModified" datetime="2019-05-20T14:57:35+08:00">2019-05-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>elasticsearch 性能提升可以通过下面几种方式</p>
+<ul>
+<li>集群规划</li>
+<li>存储策略</li>
+<li>索引拆分</li>
+<li>压缩</li>
+<li>冷热分区</li>
+</ul>
+<h1 id="集群规划"><a href="#集群规划" class="headerlink" title="集群规划"></a>集群规划</h1><p>在 elasticsearch 集群中有两种角色，Master Node 和 Data Node，其他例如 tribe Node 节点可根据业务需要另行设定。为了让集群有更好的性能表现，应该对角色有更好的规划，在 Node 之间做读取分离，保证集群的稳定性和快速响应，在大规模的数据存储和查询的压力之下能够坦然面对， 愉快的协作。</p>
+<h2 id="Master-Node"><a href="#Master-Node" class="headerlink" title="Master Node"></a>Master Node</h2><p>Master Node 是集群的管理者，负责对 index 的管理、shards 的分配，以及整个集群拓扑信息的管理等功能。 Master Node 可以通过 Date Node 兼任，如果要提高集群稳定性，Master Node 推荐队里。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node.master: true</span><br><span class="line">node.data: false</span><br><span class="line">node.ingest: false</span><br><span class="line">search.remote.connect: false</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>这样 Master Node 将不参与数据搜索和索引操作 ，专门负责集群的管理工作，因此配置可以相对降低。 另外为了防止集群脑裂，合理配置 discovery.zen.minimum_master_nodes 参数，官方推荐 master-eligible nodes / 2 + 1 向下取整的个数。 这个参数决定选举 Master 的 Node 个数，太小容易发生”脑裂”，可能会出现多个 Master，数值太大 Master 将无法选举。</p>
+<p>参考文档</p>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/modules-node.html#master-node" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/modules-node.html#master-node</a></p>
+</blockquote>
+<h2 id="Data-Node"><a href="#Data-Node" class="headerlink" title="Data Node"></a>Data Node</h2><p>Data Node 是数据的承载者，对索引的数据存储、查询、聚合等操作提供支持。这些操作严重消耗 CPU 、内存、IO资源， 同样 Data Node 不适合兼任 Master 功能。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node.master: false</span><br><span class="line">node.data: true</span><br><span class="line">node.ingest: false</span><br><span class="line">search.remote.connect: false</span><br></pre></td></tr></table></figure>
+<p>参考文档</p>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/modules-node.html#data-node" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/modules-node.html#data-node</a></p>
+</blockquote>
+<h2 id="Coordinating-only-node"><a href="#Coordinating-only-node" class="headerlink" title="Coordinating only node"></a>Coordinating only node</h2><p>在 elasticsearch 集群中，每个 node 都可以相应用户的请求，在某个 node 收到用户的请求，会将 请求转发到集群中所有索引相关的 node 上，之后每个 node 将计算结果返回给请求者，当这个 node 在 并发和数据量较大的情况下， 由于数据的聚合可能导致内存和网络出现瓶颈。Coordinating Nodes， 只负责路由用户的请求，包括读、写等操作，对内存、网络和 CPU 要求比较高。本质上，Coordinating Only Nodes 可以笼统的理解为是一个负载均衡器，或者反向代理，只负责读，本身不写数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node.master: false</span><br><span class="line">node.data: false</span><br><span class="line">node.ingest: false</span><br><span class="line">search.remote.connect: false</span><br></pre></td></tr></table></figure>
+<p>增加 Coordinating Nodes 的数量可以提高 API 请求响应的性能，我们也可以针对不同量级的 Index 分配独立的 Coordinating Nodes 来满足请求性能。 那是不是越多越好呢?在一定范围内是肯定的，但凡事有个度，过了负作用就会突显，太多的话会给集群增加负担。 在做 Master 选举的时候会先确保所有 Node 的 Cluster State 是一致的，同步的时候会等待每个 Node 的 Acknowledgement 确认，所以适量分配可以让集群畅快的工作。search.remote.connect 是禁用跨集群查询，防止在进行集群之间查询时发生二次路由。</p>
+<p>参考文档</p>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/modules-node.html#data-node" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/modules-node.html#data-node</a></p>
+</blockquote>
+<h1 id="存储策略"><a href="#存储策略" class="headerlink" title="存储策略"></a>存储策略</h1><h2 id="Routing"><a href="#Routing" class="headerlink" title="Routing"></a>Routing</h2><p>类似于分布式数据库中的分片原则，将符合规则的数据存储到同一分片。Elasticsearch 通过哈希算法来决定数据存储于哪个 Shard</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">shard_num = hash(_routing) % num_primary_shards</span><br><span class="line"></span><br><span class="line">其中 hash(_routing) 得出一个数字，然后除以主 Shards 的数量得到一个余数，余数的范围是 0 到 number_of_primary_shards - 1，这个数字就是文档所在的 Shard。</span><br><span class="line"></span><br><span class="line">Routing 默认是 id 值，当然可以自定义，合理指定 Routing 能够大幅提升查询效率，Routing 支持 GET、Delete、Update、Post、Put 等操作。</span><br><span class="line"></span><br><span class="line">PUT my_index/_doc/1?routing=user1&amp;refresh=true</span><br><span class="line">&#123;</span><br><span class="line">  &quot;title&quot;: &quot;This is a document&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">GET my_index/_doc/1?routing=user1</span><br></pre></td></tr></table></figure>
+<p>不指定 routing 的查询过程</p>
+<p><img src="https://www.oneops.co/images/elk/elasticsearch-norouting.jpg" alt> 简单的来说，一个查询请求过来以后会查询每个 Shard，然后做结果聚合，总的时间大概就是所有 Shard 查询所消耗的时间之和。</p>
+<p>指定 routing 的查询过程 <img src="https://www.oneops.co/images/elk/elasticsearch-routing.jpg" alt> 会根据 routing 查询特定的一个或多个 shard，这样便大大减少的查询时间，提高了查询效率。</p>
+<p>如何设置 routing 是一个难点，需要根据业务特点组合 routing 的值，来划分 shard 的值，保持数量相对均衡。 可以组合几个维度做为 Routing ，有点类似于 Hbase Key，例如不同的业务线加不同的类别，不同的城市和不同的类型等等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">_search?routing=beijing：按城市。</span><br><span class="line">_search?routing=beijing_user123：按城市和用户。</span><br><span class="line">_search?routing=beijing_android，shanghai_android：按城市和手机类型等。</span><br></pre></td></tr></table></figure>
+<p>如果 A 业务的数据量远大于 B 业务线，有时候很难通过 routing 指定一个值保证所以 shards 分布均衡</p>
+<h3 id="单独为大数据设置独立-index"><a href="#单独为大数据设置独立-index" class="headerlink" title="单独为大数据设置独立 index"></a>单独为大数据设置独立 index</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://localhost:9200/shanghai,beijing,other/_search?routing=android</span><br></pre></td></tr></table></figure>
+<h3 id="通过指定-index-参数"><a href="#通过指定-index-参数" class="headerlink" title="通过指定 index 参数"></a>通过指定 index 参数</h3><p>通过指定 index.routing_partition_size，来解决最终可能产生群集不均衡的问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">shard_num = (hash(_routing) + hash(_id) % routing_partition_size) % num_primary_shards</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">最终数据会在 routing_partition_size 几个 Shard 上均匀存储，是哪个 Shard 取决于 hash(_id) % routing_partition_size 的计算结果。</span><br><span class="line">指定参数 index.routing_partition_size 后，索引中的 Mappings 必须指定 _routing 为 &quot;required&quot;: true，另外 Mappings 不支持 parent-child 父子关系。很多情况下，指定 Routing 后会大幅提升查询性能，毕竟查询的 Shard 只有那么几个，但是如何设置 Routing 是个难题，可根据业务特性巧妙组合。</span><br></pre></td></tr></table></figure>
+<p>参考文档</p>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/mapping-routing-field.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/mapping-routing-field.html</a> ndex.routing_partition_size 应具有大于 1 且小于 index.number_of_shards 的值。</p>
+</blockquote>
+<h1 id="索引拆分"><a href="#索引拆分" class="headerlink" title="索引拆分"></a>索引拆分</h1><p>index 通过横向扩展 shards 实现分布式存储，这样可以解决 index 大数据存储问题。但是一个 index 变得越来越大，单个 shard 也越来越大，查询和存储速度也降低，更重要的是一个 index 其实是有存储上限的，官方声明单个 shard 的文档不能超过 20 亿（受限于 Lucene index，每个 shard 是一个 Lucene index）。 考虑到 IO，针对 index 每个 node 的 shard 数量最好不超过 3 个。index 拆分的思路很简单，时序索引由一个好处就是只有增加，没有变更，按时间累积，天然对索引的拆分友好支持，可以按照时间和数据量做任意时间段的拆分。</p>
+<p>Elasticsearch 提供的 rollover api + index template 可以非常便捷和友好的时间 index 的拆分工作，把每个 index docs 数据控制在百亿内，也就是一个 index 默认 5 个 shards 左右即可，保证查询的及时响应。</p>
+<h2 id="index-template"><a href="#index-template" class="headerlink" title="index template"></a>index template</h2><p>Elasticsearch 可以为同一目的或同一类型索引常见一个 index template，之后创建的索引是要符合匹配规则就会套用这个 template，不必每次指定 setting 和 mappings 等属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">PUT _template/template_1</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index_patterns&quot;: [&quot;te*&quot;, &quot;bar*&quot;],</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;number_of_shards&quot;: 1</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;mappings&quot;: &#123;</span><br><span class="line">    &quot;type1&quot;: &#123;</span><br><span class="line">      &quot;_source&quot;: &#123;</span><br><span class="line">        &quot;enabled&quot;: false</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;properties&quot;: &#123;</span><br><span class="line">        &quot;host_name&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;created_at&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;date&quot;,</span><br><span class="line">          &quot;format&quot;: &quot;EEE MMM dd HH:mm:ss Z YYYY&quot;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="rollover-index"><a href="#rollover-index" class="headerlink" title="rollover index"></a>rollover index</h2><p>rollover Index 可以将现有的索引通过一定的规则，如数据量和时间，索引的命名必须是 logs-000001 这种格式，并指定 aliases。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">PUT /logs-000001</span><br><span class="line">&#123;</span><br><span class="line">  &quot;aliases&quot;: &#123;</span><br><span class="line">    &quot;logs_write&quot;: &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># Add &gt; 1000 documents to logs-000001</span><br><span class="line"></span><br><span class="line">POST /logs_write/_rollover</span><br><span class="line">&#123;</span><br><span class="line">  &quot;conditions&quot;: &#123;</span><br><span class="line">    &quot;max_age&quot;:   &quot;7d&quot;,</span><br><span class="line">    &quot;max_docs&quot;:  1000,</span><br><span class="line">    &quot;max_size&quot;:  &quot;5gb&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先创建索引并指定别名 logs_write，插入 1000 条数据，然后请求 <code>_rollover api</code> 并指定拆分规则。</p>
+<p>如果索引中的数据大于规则中指定的数据量或者时间过时，新的索引将被创建，索引名称为 logs-000002，并根据规则套用 Index Template，同时别名 logs_write 也将被变更到 logs-000002。</p>
+<p>注意事项</p>
+<ul>
+<li>索引命名规则必须如同：logs-000001。</li>
+<li>索引必须指定 aliases。</li>
+<li>Rollover Index API 调用时才去检查索引是否超出指定规则，不会自动触发，需要手动调用，可以通过 Curator 实现自动化。</li>
+<li>如果符合条件会创建新的索引，老索引的数据不会发生变化，如果你已经插入 2000 条，拆分后还是 2000 条。</li>
+<li>插入数据时一定要用别名，否则你可能一直在往一个索引里追加数据。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /&lt;logs-&#123;now/d&#125;-*&gt;,&lt;logs-&#123;now/d-1d&#125;-*&gt;,&lt;logs-&#123;now/d-2d&#125;-*&gt;/_search</span><br></pre></td></tr></table></figure>
+<p>参考文档</p>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-rollover-index.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-rollover-index.html</a></p>
+</blockquote>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-templates.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/indices-templates.html</a></p>
+</blockquote>
+<h1 id="Hot-Warm-架构"><a href="#Hot-Warm-架构" class="headerlink" title="Hot-Warm 架构"></a>Hot-Warm 架构</h1><p><img src="https://www.oneops.co/images/elk/elasitcsearch-hotwarn.jpg" alt> 冷热架构，为了保证大规模集群时序索引实时数据分析的时效性，可以根据资源配置不同将 data node 进行分类形成分层或分组架构。一部分支持新数据的读写，另外一部分仅支持历史数据的存储，存放一些查询发生几率较低的数据。即 hot-warn 架构，对cpu、磁盘、内存等硬件资源合理规划和利用，达到性能和效率的最大化。 可以通过 Elasticsearch 的 shard allocation filtering 来 实现 hot-warn 架构。思路如下</p>
+<ul>
+<li>将 data node 根据不同的资源打上标签，例如，hot、 warn</li>
+<li>定义 2 个时序索引的 index template，包括 hot-template、warn-template，hot-template 可以多分配一些 shard 和更好资源的 hot node</li>
+<li>hot-template 创建一个 active index 名为 active-logs-1，别名为 active-logs，支持索引切割</li>
+<li>插入一定数据后，通过 roller over api 将 active-logs 切割，并将切割前的 Index 移动到 Warm Nodes 上，如 active-logs-1，并阻止写入。</li>
+<li>通过 Shrinking API 收缩索引 active-logs-1 为 inactive-logs-1，原 Shard 为 5，适当收缩到 2 或 3，可以在 Warm Template 中指定，减少检索的 Shard，使查询更快。</li>
+<li>通过 force-merging api 合并 inactive-logs-1 索引每个 Shard 的 Segment，节省存储空间。</li>
+<li>删除 active-logs-1。</li>
+</ul>
+<p>参考文档</p>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/shard-allocation-filtering.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/shard-allocation-filtering.html</a></p>
+</blockquote>
+<h2 id="hot-warn-node"><a href="#hot-warn-node" class="headerlink" title="hot,warn node"></a>hot,warn node</h2><h3 id="hot-node"><a href="#hot-node" class="headerlink" title="hot node"></a>hot node</h3><p>拥有最好资源的data-node ，如果计划以 100 亿为单位来切割index，那么至少需要三个 data-node，index 的 shard 为 5，每个 shard 支持 20 亿 Documents 数据存储。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 启动参数</span><br><span class="line">./bin/elasticsearch -Enode.attr.box_type=hot</span><br><span class="line"></span><br><span class="line">// 配置文件</span><br><span class="line">node.attr.box_type: warm</span><br></pre></td></tr></table></figure>
+<h3 id="Warm-Nodes"><a href="#Warm-Nodes" class="headerlink" title="Warm Nodes"></a>Warm Nodes</h3><p>存储只读数据，并且查询量较少，但用于存储长多时间历史数据的 Data Nodes，这类 Nodes 相对 Hot Nodes 较差的硬件配置，根据需求配置稍差的 CPU、机械磁盘和其他硬件资源，至于数量根据需要保留多长时间的数据来配比，同样需要打上标签，方法跟 Hot Nodes 一样，指定为 Warm，box_type: warm。</p>
+<h2 id="Hot，Warm-Template"><a href="#Hot，Warm-Template" class="headerlink" title="Hot，Warm Template"></a>Hot，Warm Template</h2><h3 id="Hot-Template"><a href="#Hot-Template" class="headerlink" title="Hot Template"></a>Hot Template</h3><p>我们可以通过指定参数”routing.allocation.include.box_type”: “hot”，让所有符合命名规则索引的 Shard 都将被分配到 Hot Nodes 上：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">PUT _template/active-logs</span><br><span class="line">&#123;</span><br><span class="line">  &quot;template&quot;: &quot;active-logs-*&quot;,</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;number_of_shards&quot;:   5,</span><br><span class="line">    &quot;number_of_replicas&quot;: 1,</span><br><span class="line">    &quot;routing.allocation.include.box_type&quot;: &quot;hot&quot;,</span><br><span class="line">    &quot;routing.allocation.total_shards_per_node&quot;: 2</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;aliases&quot;: &#123;</span><br><span class="line">    &quot;active-logs&quot;:  &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Warm-Template"><a href="#Warm-Template" class="headerlink" title="Warm Template"></a>Warm Template</h3><p>同样符合命名规则索引的 Shard 会被分配到 Warm Nodes 上，我们指定了更少的 Shards 数量和复本数。</p>
+<p>注意，这里的复本数为 0，和 best_compression 级别的压缩，方便做迁移等操作，以及进行一些数据的压缩：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">PUT _template/inactive-logs</span><br><span class="line">&#123;</span><br><span class="line">  &quot;template&quot;: &quot;inactive-logs-*&quot;,</span><br><span class="line">  &quot;settings&quot;: &#123;</span><br><span class="line">    &quot;number_of_shards&quot;:   1,</span><br><span class="line">    &quot;number_of_replicas&quot;: 0,</span><br><span class="line">    &quot;routing.allocation.include.box_type&quot;: &quot;warm&quot;,</span><br><span class="line">    &quot;codec&quot;: &quot;best_compression&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假如我们已经创建了索引 active-logs-1 ，当然你可以通过 <code>_bulk API</code> 快速写入测试的数据，然后参考上文中介绍的 Rollover API 进行切割。</p>
+<h2 id="Shrink-Index"><a href="#Shrink-Index" class="headerlink" title="Shrink Index"></a>Shrink Index</h2><p>Rollover API 切割以后，active-logs-1 将变成一个冷索引，我们将它移动到 Warm Nodes 上。</p>
+<p>先将索引置为只读状态，拒绝任何写入操作，然后修改 index.routing.allocation.include.box_type 属性，ES 会自动移动所有 Shards 到目标 Data Nodes 上：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PUT active-logs-1/_settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;index.blocks.write&quot;: true,</span><br><span class="line">  &quot;index.routing.allocation.include.box_type&quot;: &quot;warm&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Cluster Health API 可以查看迁移状态，完成后进行收缩操作，其实相当于复制出来一个新的索引，旧的索引还存在。</p>
+<h2 id="Forcemerge"><a href="#Forcemerge" class="headerlink" title="Forcemerge"></a>Forcemerge</h2><p>到目前为止我们已经实现了索引的冷热分离，和索引的收缩，我们知道每个 Shard 下面由多个 Segment 组成，那 inactive-logs-1 的 Shard 数是 1，但 Segment 还是多个。这类索引不会在接受写入操作，为了节约空间和改善查询性能，通过 Forcemerge API 将 Segment 适量合并</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PUT inactive-logs-1/_settings</span><br><span class="line">&#123; &quot;number_of_replicas&quot;: 1 &#125;</span><br></pre></td></tr></table></figure>
+<p>ES 的 Forcemerge 过程是先创建新的 Segment 删除旧的，所以旧 Segment 的压缩方式 best_compression 不会在新的 Segment 中生效，新的 Segment 还是默认的压缩方式。现在 inactive-logs-1 的复本还是 0，如果有需要的话，可以分配新的复本数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PUT inactive-logs-1/_settings</span><br><span class="line">&#123; &quot;number_of_replicas&quot;: 1 &#125;</span><br></pre></td></tr></table></figure>
+<p>最后删除 active-logs-1，因为我们已经为它做了一个查询复本 inactive-logs-1。</p>
+<h1 id="其他优化方案"><a href="#其他优化方案" class="headerlink" title="其他优化方案"></a>其他优化方案</h1><h2 id="索引隔离"><a href="#索引隔离" class="headerlink" title="索引隔离"></a>索引隔离</h2><p><img src="https://www.oneops.co/images/elk/elasticsearch-indexisolation.jpg" alt> 在多条业务线的索引共用一个 ES 集群时会发生流量被独吃独占的情况，因为大家都共用相同的集群资源，流量大的索引会占用大部分计算资源而流量小的也会被拖慢，得不到即时响应，或者说业务流量大的索引可以按天拆分，几个流量小的索引可以按周或月拆分。这种情况下我们可以将规模大的索引和其他相对小规模的索引独立存储，分开查询或合并查询。除了 Master Nodes 以外，Data Nodes 和 Coordinating Nodes 都可以独立使用(其实如果每个索引的量都特别大也应该采用这种架构)，还有一个好处是对方的某个 Node 挂掉，自己不受影响。同样利用 ES 支持 Shard Allocation Filtering 功能来实现索引的资源独立分配，先将 Nodes 进行打标签，划分区域，类似于 Hot-Warm 架构</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node.attr.zone=zone_a、node.attr.zone=zone_b</span><br></pre></td></tr></table></figure>
+<p>等打标签的方式来区别对应不同的索引，然后在各自的 Index Template 中指定不同的 node.attr.zone 即可。如”index.routing.allocation.include.zone” : “zone_a,zone_hot_a”，或者排除法”index.routing.allocation.exclude.size”: “zone_hot_b”分配到 zone_hot_b 以外的所有 Data Nodes 上。更多用法可以参考 Hot-Warm 架构，或 shard-allocation-filtering</p>
+<p>参考文档</p>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/shard-allocation-filtering.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/current/shard-allocation-filtering.html</a></p>
+</blockquote>
+<h2 id="跨数据中心"><a href="#跨数据中心" class="headerlink" title="跨数据中心"></a>跨数据中心</h2><p><img src="https://www.oneops.co/images/elk/elasticsearch-clusters.jpg" alt></p>
+<p>如果你的业务遍布全国各地，四海八荒，如果你数据要存储到多个机房，如果你的 Index 有几万个甚至更多( Index 特别多，集群庞大会导致 Cluster State 信息量特别大，因为 Cluster State 包含了所有 Shard、Index、Node 等所有相关信息，它存储在每个 Node 上，这些数据发生变化都会实时同步到所有 Node 上，当这个数据很大的时候会对集群的性能造成影响)。这些情况下我们会考虑部署多个 ES Cluster，那我们将如何解决跨集群查询的问题呢?目前 ES 针对跨集群操作提供了两种方案 Tribe Node 和 Cross Cluster Search。</p>
+<p><img src="https://www.oneops.co/images/elk/elasticsearch-tribenode.jpg" alt></p>
+<p>需要一个独立的 Node 节点，加入其他 ES Cluster，用法有点类似于 Coordinating Only Node。所不同的是 Tribe 是针对多个 ES 集群之间的所有节点，Tribe Node 收到请求广播到相关集群中所有节点，将结果合并处理后返回。表面上看起来 Tribe Node 将多个集群串连成了一个整体，遇到同名 Index 发生冲突，会选择其中一个 Index，也可以指定。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">tribe:</span><br><span class="line">  on_conflict: prefer_t1</span><br><span class="line">  t1:</span><br><span class="line">    cluster.name: us-cluster</span><br><span class="line">    discovery.zen.ping.multicast.enabled: false</span><br><span class="line">    discovery.zen.ping.unicast.hosts: [&apos;usm1&apos;,&apos;usm2&apos;,&apos;usm3&apos;]</span><br><span class="line">  t2:</span><br><span class="line">    cluster.name: eu-cluster</span><br><span class="line">    discovery.zen.ping.multicast.enabled: false</span><br><span class="line">    discovery.zen.ping.unicast.hosts: [&apos;eum1&apos;,&apos;eum2&apos;,&apos;eum3&apos;]</span><br></pre></td></tr></table></figure>
+<p>参考文档</p>
+<blockquote>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/6.2/modules-tribe.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/6.2/modules-tribe.html</a></p>
+</blockquote>
+<h2 id="Cross-Cluster-Search"><a href="#Cross-Cluster-Search" class="headerlink" title="Cross Cluster Search"></a>Cross Cluster Search</h2><p><img src="https://www.oneops.co/images/elk/elasticsearch-crosscluster.jpg" alt> Cross Cluster Search 可以让集群中的任意一个节点联合查询其他集群中的数据， 通过配置 elasticsearch.yml 或者 API 来启用这个功能，API 示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">PUT _cluster/settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;persistent&quot;: &#123;</span><br><span class="line">    &quot;search&quot;: &#123;</span><br><span class="line">      &quot;remote&quot;: &#123;</span><br><span class="line">        &quot;cluster_one&quot;: &#123;</span><br><span class="line">          &quot;seeds&quot;: [</span><br><span class="line">            &quot;127.0.0.1:9300&quot;</span><br><span class="line">          ]</span><br><span class="line">    ...</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>提交以后整个集群所有节点都会生效，都可以做为代理去做跨集群联合查询，不过我们最好还是通过 Coordinating Only Nodes 去发起请求。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">POST /cluster_one:decision,decision/_search</span><br><span class="line">&#123;</span><br><span class="line">    &quot;match_all&quot;: &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对集群 cluster_one 和本集群中名为 Decision 的索引联合查询。目前这个功能还在测试阶段，但未来可能会取代 Tribe Node，之间的最大的差异是 Tribe Node 需要设置独立的节点，而 Cross Cluster Search 不需要，集群中的任意一个节点都可以兼任。 比如可以用我们的 Coordinating Only Nodes 做为联合查询节点，另一个优点是配置是动态的，不需要重启节点。实际上可以理解为是一个 ES 集群之间特定的动态代理工具，支持所有操作，包括 Index 的创建和修改，并且通过 Namespace 对 Index 进行隔离，也解决了 Tribe Node 之 Index 名称冲突的问题。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/elasticstack/" rel="tag"> <i class="fa fa-tag"></i> elasticstack</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+               <div>
+                 
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+               </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/08/proxychains-ng.html" rel="next" title="在终端下使用ProxyChains-NG代理">
+                <i class="fa fa-chevron-left"></i> 在终端下使用ProxyChains-NG代理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/28/python-debugtools-pysnooper.html" rel="prev" title="极简 DeBug 工具 PySnooper">
+                极简 DeBug 工具 PySnooper <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjY0MS8xOTE4OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/blog/avatar.jpg" alt="Cc">
+            
+              <p class="site-author-name" itemprop="name">Cc</p>
+              <p class="site-description motion-element" itemprop="description">Love Linux ♥ Love Python. 猴赛雷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#集群规划"><span class="nav-number">1.</span> <span class="nav-text">集群规划</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Master-Node"><span class="nav-number">1.1.</span> <span class="nav-text">Master Node</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Data-Node"><span class="nav-number">1.2.</span> <span class="nav-text">Data Node</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Coordinating-only-node"><span class="nav-number">1.3.</span> <span class="nav-text">Coordinating only node</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#存储策略"><span class="nav-number">2.</span> <span class="nav-text">存储策略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Routing"><span class="nav-number">2.1.</span> <span class="nav-text">Routing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单独为大数据设置独立-index"><span class="nav-number">2.1.1.</span> <span class="nav-text">单独为大数据设置独立 index</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过指定-index-参数"><span class="nav-number">2.1.2.</span> <span class="nav-text">通过指定 index 参数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引拆分"><span class="nav-number">3.</span> <span class="nav-text">索引拆分</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#index-template"><span class="nav-number">3.1.</span> <span class="nav-text">index template</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rollover-index"><span class="nav-number">3.2.</span> <span class="nav-text">rollover index</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hot-Warm-架构"><span class="nav-number">4.</span> <span class="nav-text">Hot-Warm 架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hot-warn-node"><span class="nav-number">4.1.</span> <span class="nav-text">hot,warn node</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#hot-node"><span class="nav-number">4.1.1.</span> <span class="nav-text">hot node</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Warm-Nodes"><span class="nav-number">4.1.2.</span> <span class="nav-text">Warm Nodes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hot，Warm-Template"><span class="nav-number">4.2.</span> <span class="nav-text">Hot，Warm Template</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hot-Template"><span class="nav-number">4.2.1.</span> <span class="nav-text">Hot Template</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Warm-Template"><span class="nav-number">4.2.2.</span> <span class="nav-text">Warm Template</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shrink-Index"><span class="nav-number">4.3.</span> <span class="nav-text">Shrink Index</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Forcemerge"><span class="nav-number">4.4.</span> <span class="nav-text">Forcemerge</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他优化方案"><span class="nav-number">5.</span> <span class="nav-text">其他优化方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#索引隔离"><span class="nav-number">5.1.</span> <span class="nav-text">索引隔离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跨数据中心"><span class="nav-number">5.2.</span> <span class="nav-text">跨数据中心</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cross-Cluster-Search"><span class="nav-number">5.3.</span> <span class="nav-text">Cross Cluster Search</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cc</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/04/09/elasticsearch-performance-improvement.html'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
+</body>
+</html>

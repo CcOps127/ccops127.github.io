@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Windows下Ansible工作原理Ansible 从 1.7+ 版本开始支持 Windows，但前提是管理机必须为 Linux 系统，远程主机的通信方式也由 SSH 变更为 PowerShell，基于 Kerberos 认证方式，同时管理机必须预安装Python 的 Winrm 模块，方可和远程 Windows 主机正常通信，但 PowerShell 需 3.0+ 版本且 Management">
+<meta name="keywords" content="ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用ansible管理windows主机">
+<meta property="og:url" content="https://www.oneops.co/2017/10/24/ansible-control-windows.html">
+<meta property="og:site_name" content="Cc&#39;s Blog">
+<meta property="og:description" content="Windows下Ansible工作原理Ansible 从 1.7+ 版本开始支持 Windows，但前提是管理机必须为 Linux 系统，远程主机的通信方式也由 SSH 变更为 PowerShell，基于 Kerberos 认证方式，同时管理机必须预安装Python 的 Winrm 模块，方可和远程 Windows 主机正常通信，但 PowerShell 需 3.0+ 版本且 Management">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.oneops.co/images/ansible/powershell_version.png">
+<meta property="og:image" content="https://www.oneops.co/images/ansible/powershell_version3.png">
+<meta property="og:updated_time" content="2019-05-20T06:57:34.990Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用ansible管理windows主机">
+<meta name="twitter:description" content="Windows下Ansible工作原理Ansible 从 1.7+ 版本开始支持 Windows，但前提是管理机必须为 Linux 系统，远程主机的通信方式也由 SSH 变更为 PowerShell，基于 Kerberos 认证方式，同时管理机必须预安装Python 的 Winrm 模块，方可和远程 Windows 主机正常通信，但 PowerShell 需 3.0+ 版本且 Management">
+<meta name="twitter:image" content="https://www.oneops.co/images/ansible/powershell_version.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.oneops.co/2017/10/24/ansible-control-windows.html">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>使用ansible管理windows主机 | Cc's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=71693959-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '71693959-4');
+</script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Cc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">生命不止 学习不息</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2017/10/24/ansible-control-windows.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用ansible管理windows主机
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-10-24 23:41:28" itemprop="dateCreated datePublished" datetime="2017-10-24T23:41:28+08:00">2017-10-24</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-05-20 14:57:34" itemprop="dateModified" datetime="2019-05-20T14:57:34+08:00">2019-05-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Windows下Ansible工作原理"><a href="#Windows下Ansible工作原理" class="headerlink" title="Windows下Ansible工作原理"></a>Windows下Ansible工作原理</h1><p>Ansible 从 1.7+ 版本开始支持 Windows，但前提是管理机必须为 Linux 系统，远程主机的通信方式也由 SSH 变更为 PowerShell，基于 Kerberos 认证方式，同时管理机必须预安装Python 的 Winrm 模块，方可和远程 Windows 主机正常通信，但 PowerShell 需 3.0+ 版本且 <code>Management Framework 3.0+</code>版本，实测 <code>Windows 7 SP1</code> 和<code>Windows Server 2008 R2</code>及以上版本系统经简单配置可正常与 Ansible 通信。简单总结如下：</p>
+<ul>
+<li>管理机必须为 Linux系统且需预安装 Python Winrm 模块</li>
+<li>底层通信基于 PowerShell，认证基于 Kerberos</li>
+<li>远程主机 PowerShell 版本为3.0+，Management Framework 版本为3.0+。</li>
+</ul>
+<p>如上条件满足后，方可正常和Ansible通信。</p>
+<h2 id="系统介绍"><a href="#系统介绍" class="headerlink" title="系统介绍"></a>系统介绍</h2><ul>
+<li>管理主机: 172.16.8.247 操作系统: Ubuntu16.04</li>
+<li>被控主机: 172.16.11.176 操作系统: Windows2008_R2_64</li>
+</ul>
+<h2 id="配置管理主机"><a href="#配置管理主机" class="headerlink" title="配置管理主机"></a>配置管理主机</h2><h3 id="安装-winrm-模块"><a href="#安装-winrm-模块" class="headerlink" title="安装 winrm 模块"></a>安装 winrm 模块</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt install python-pip</span><br><span class="line">pip install &quot;pywinrm&gt;=0.1.1&quot;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h3 id="动态目录的支持"><a href="#动态目录的支持" class="headerlink" title="动态目录的支持"></a>动态目录的支持</h3><p>如果 windows 主机是通过 活动目录的管理方式，管理机和被管理机基于 <code>kerbero</code>认证，需要安装 <code>python-kerbero</code> 和 <code>MIT krb5</code> 依赖库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get install python-dev libkrb5-dev</span><br><span class="line">pip install Kerberos</span><br></pre></td></tr></table></figure>
+<p>配置 Kerberos，在<code>/etc/krb5.conf</code>添加下面配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[realms]</span><br><span class="line"> MY.DOMAIN.COM = &#123;</span><br><span class="line">  kdc = domain-controller1.my.domain.com</span><br><span class="line">  kdc = domain-controller2.my.domain.com</span><br><span class="line"> &#125;</span><br><span class="line"> [domain_realm]</span><br><span class="line">    .my.domain.com = MY.DOMAIN.COM</span><br></pre></td></tr></table></figure>
+<p>验证域账号认证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kinit user@My.DOAMIN.COM</span><br></pre></td></tr></table></figure>
+<h3 id="配置-inventory-主机信息和group-vars-windows-yml变量信息"><a href="#配置-inventory-主机信息和group-vars-windows-yml变量信息" class="headerlink" title="配置 inventory 主机信息和group_vars/windows.yml变量信息"></a>配置 inventory 主机信息和<code>group_vars/windows.yml</code>变量信息</h3><ul>
+<li>inventory</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[windows]    </span><br><span class="line">172.16.11.176</span><br></pre></td></tr></table></figure>
+<ul>
+<li>group_vars</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">windows.yml</span><br><span class="line">ansible_ssh_user: Administrator</span><br><span class="line">ansible_ssh_password: passoword                                                                                                                                </span><br><span class="line">ansible_ssh_port: 5986        </span><br><span class="line">ansible_connection: winrm</span><br><span class="line">ansible_winrm_server_cert_validation: ignore</span><br></pre></td></tr></table></figure>
+<p>这里的 ssh_port 不是真正的SSH协议的端口</p>
+<h2 id="被控主机-Windows2008-R2-64"><a href="#被控主机-Windows2008-R2-64" class="headerlink" title="被控主机 (Windows2008_R2_64)"></a>被控主机 (Windows2008_R2_64)</h2><p>和 Linux 发版版稍有区别，远程主机为 Windows 需预先如下配置</p>
+<ul>
+<li>安装Framework 3.0+</li>
+<li>设置PowerShell本地脚本运行权限为remotesigned</li>
+<li>升级PowerShell至3.0+</li>
+<li>自动设置Windows远端管理，英文全称WS-Management（WinRM）</li>
+</ul>
+<h3 id="安装-Framework-3-0"><a href="#安装-Framework-3-0" class="headerlink" title="安装 Framework 3.0+"></a>安装 Framework 3.0+</h3><p>如果系统已经安装可以忽略</p>
+<h3 id="设置-PowerShell-本地脚本运行权限为-remotesigned"><a href="#设置-PowerShell-本地脚本运行权限为-remotesigned" class="headerlink" title="设置 PowerShell 本地脚本运行权限为 remotesigned"></a>设置 PowerShell 本地脚本运行权限为 remotesigned</h3><p>Windows 系统默认不允许非 Adminitor 外的普通用户执行 SP 脚本，即使是管理员，如下开放 SP 脚本执行权限。</p>
+<ul>
+<li>在 cmd 中执行 regedit.exe 打开注册表，在<code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell</code>新建字符串值名为<code>ExecutionPolicy</code>，值为<code>remotesigned</code> <strong>或者</strong>，打开 PowerShell 执行命令：<code>set-executionpolicy -executionpolicy unrestricted</code></li>
+</ul>
+<p>这里共4种权限：</p>
+<ul>
+<li>Restricted–默认的设置， 不允许任何script运行；</li>
+<li>AllSigned–只能运行经过数字证书签名的script；</li>
+<li>RemoteSigned–运行本地的script不需要数字签名，但是运行从网络上下载的script就必须要有数字签名；</li>
+<li>Unrestricted–允许所有的script运行。</li>
+</ul>
+<h3 id="升级-powershell至3-0"><a href="#升级-powershell至3-0" class="headerlink" title="升级 powershell至3.0+"></a>升级 powershell至3.0+</h3><p><code>PowerShell 3.0+ `</code>需基于<code>Windows 7 Sp1</code>安装，Windows7 系统 Sp1 补丁升级请参考 <a href="http://windows.microsoft.com/installwindows7sp1。`Window" target="_blank" rel="noopener">http://windows.microsoft.com/installwindows7sp1。`Window</a> 7 和 <code>Windows Server 2008 R2</code>默认安装的有 PowerShell，但版本号一般为<code>2.0</code>版本，所以我们需升级至3.0+，如下图中数字1部分表示PowerShell版本过低需3.0+版本，数字2部分表示当前PowerShell版本为2.0</p>
+<ul>
+<li><p>查询 powershell 版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//在cmd中执行命令进入powershell</span><br><span class="line">powershell</span><br><span class="line">// 检查powershell版本</span><br><span class="line">Get-Host</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><img src="https://www.oneops.co/images/ansible/powershell_version.png" alt="powershell_version"></p>
+<ul>
+<li>升级 powershell</li>
+</ul>
+<p><a href="https://codeload.github.com/cchurch/ansible/zip/devel" target="_blank" rel="noopener">下载</a>或者<a href="https://github.com/cchurch/ansible.git" target="_blank" rel="noopener">克隆</a>升级脚本</p>
+<p>选择使用 powershell 执行<code>ansible-devel\examples\scripts\upgrade_to_ps3</code> 脚本，执行后重启服务器，再次检查 powershell 版本。</p>
+<p><img src="https://www.oneops.co/images/ansible/powershell_version3.png" alt="powershell_version3"></p>
+<ul>
+<li>设置Windows远端管理（WS-Management，WinRM）</li>
+</ul>
+<p>选择使用 powershell 执行<code>ansible-devel\examples\scripts\ConfigureRemotingForAnsible.ps1</code> 脚本,执行结果没有返回值即为正常。如执行出现”由于此计算机上的网络连接类型之一设置为公用，因此 WinRM 防火墙例外将不运行”类似报错，请在 PowerShell 中执行命令 Enable-PSRemoting – SkipNetworkProfileCheck –Force 尝试解决。</p>
+<h2 id="验证配置"><a href="#验证配置" class="headerlink" title="验证配置"></a>验证配置</h2><ul>
+<li>验证连接</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">curl -vk -d &quot; &quot; -u &quot;administrator:passowrd&quot; https://172.16.11.176:5986/wsman</span><br><span class="line">*   Trying 172.16.11.176...</span><br><span class="line">* Connected to 172.16.11.176 (172.16.11.176) port 5986 (#0)</span><br><span class="line">* found 173 certificates in /etc/ssl/certs/ca-certificates.crt</span><br><span class="line">* found 694 certificates in /etc/ssl/certs</span><br><span class="line">* ALPN, offering http/1.1</span><br><span class="line">* SSL connection using TLS1.0 / RSA_AES_128_CBC_SHA1</span><br><span class="line">*        server certificate verification SKIPPED</span><br><span class="line">*        server certificate status verification SKIPPED</span><br><span class="line">*        common name: WIN-J33CVNTPJ41 (does not match &apos;172.16.11.176&apos;)</span><br><span class="line">*        server certificate expiration date OK</span><br><span class="line">*        server certificate activation date OK</span><br><span class="line">*        certificate public key: RSA</span><br><span class="line">*        certificate version: #3</span><br><span class="line">*        subject: CN=WIN-J33CVNTPJ41</span><br><span class="line">*        start date: Mon, 24 Oct 2016 22:26:13 GMT</span><br><span class="line">*        expire date: Tue, 24 Oct 2017 22:26:13 GMT</span><br><span class="line">*        issuer: CN=WIN-J33CVNTPJ41</span><br><span class="line">*        compression: NULL</span><br><span class="line">* ALPN, server did not agree to a protocol</span><br><span class="line">* Server auth using Basic with user &apos;administrator&apos;</span><br><span class="line">&gt; POST /wsman HTTP/1.1</span><br><span class="line">&gt; Host: 172.16.11.176:5986</span><br><span class="line">&gt; Authorization: Basic YWRtaW5pc3RyYXRvcjo4cWw2LHloWQ==</span><br><span class="line">&gt; User-Agent: curl/7.47.0</span><br><span class="line">&gt; Accept: */*</span><br><span class="line">&gt; Content-Length: 1</span><br><span class="line">&gt; Content-Type: application/x-www-form-urlencoded</span><br><span class="line">&gt;</span><br><span class="line">* upload completely sent off: 1 out of 1 bytes</span><br><span class="line">&lt; HTTP/1.1 415</span><br><span class="line">&lt; Server: Microsoft-HTTPAPI/2.0</span><br><span class="line">&lt; Date: Wed, 26 Oct 2016 04:19:36 GMT</span><br><span class="line">&lt; Connection: close</span><br><span class="line">&lt; Content-Length: 0</span><br><span class="line">&lt;</span><br><span class="line">* Closing connection 0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 linux 控制主机上执行命令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ansible windows -m win_ping</span><br><span class="line">172.16.11.176 | SUCCESS =&gt; &#123;</span><br><span class="line">    &quot;changed&quot;: false,</span><br><span class="line">    &quot;ping&quot;: &quot;pong&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">ansible windows -m setup</span><br><span class="line">172.16.11.176 | SUCCESS =&gt; &#123;</span><br><span class="line">    &quot;ansible_facts&quot;: &#123;</span><br><span class="line">        &quot;ansible_architecture&quot;: &quot;64-bit&quot;,</span><br><span class="line">        &quot;ansible_date_time&quot;: &#123;</span><br><span class="line">            &quot;date&quot;: &quot;2016/10/25&quot;,</span><br><span class="line">            &quot;day&quot;: &quot;25&quot;,</span><br><span class="line">            &quot;hour&quot;: &quot;23&quot;,</span><br><span class="line">            &quot;iso8601&quot;: &quot;2016-10-25T23:21:26&quot;,</span><br><span class="line">            &quot;minute&quot;: &quot;21&quot;,</span><br><span class="line">            &quot;month&quot;: &quot;10&quot;,</span><br><span class="line">            &quot;year&quot;: &quot;2016&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;ansible_distribution&quot;: &quot;Microsoft Windows NT 6.1.7601 Service Pack 1&quot;,</span><br><span class="line">        &quot;ansible_distribution_version&quot;: &quot;6.1.7601.65536&quot;,</span><br><span class="line">        &quot;ansible_env&quot;: &#123;</span><br><span class="line">            &quot;ALLUSERSPROFILE&quot;: &quot;C:\\ProgramData&quot;,</span><br><span class="line">            &quot;APPDATA&quot;: &quot;C:\\Users\\Administrator\\AppData\\Roaming&quot;,</span><br><span class="line">            &quot;COMPUTERNAME&quot;: &quot;WIN-J33CVNTPJ41&quot;,</span><br><span class="line">            &quot;ComSpec&quot;: &quot;C:\\Windows\\system32\\cmd.exe&quot;,</span><br><span class="line">            &quot;CommonProgramFiles&quot;: &quot;C:\\Program Files\\Common Files&quot;,</span><br><span class="line">            &quot;CommonProgramFiles(x86)&quot;: &quot;C:\\Program Files (x86)\\Common Files&quot;,</span><br><span class="line">            &quot;CommonProgramW6432&quot;: &quot;C:\\Program Files\\Common Files&quot;,</span><br><span class="line">            &quot;FP_NO_HOST_CHECK&quot;: &quot;NO&quot;,</span><br><span class="line">            &quot;HOMEDRIVE&quot;: &quot;C:&quot;,</span><br><span class="line">            &quot;HOMEPATH&quot;: &quot;\\Users\\Administrator&quot;,</span><br><span class="line">            &quot;LOCALAPPDATA&quot;: &quot;C:\\Users\\Administrator\\AppData\\Local&quot;,</span><br><span class="line">            &quot;LOGONSERVER&quot;: &quot;\\\\WIN-J33CVNTPJ41&quot;,</span><br><span class="line">            &quot;MODULE_COMPLEX_ARGS&quot;: &quot;&#123;\&quot;_ansible_version\&quot;: \&quot;2.1.2.0\&quot;, \&quot;_ansible_selinux_special_fs\&quot;: [\&quot;fuse\&quot;, \&quot;nfs\&quot;, \&quot;vboxsf\&quot;, \&quot;ramfs\&quot;], \&quot;_ansible_no_log\&quot;: false, \&quot;_ansible_verbosity\&quot;: 0, \&quot;_ansible_syslog_facility\&quot;: \&quot;LOG_USER\&quot;, \&quot;_ansible_diff\&quot;: false, \&quot;_ansible_debug\&quot;: false, \&quot;_ansible_check_mode\&quot;: false&#125;&quot;,</span><br><span class="line">            &quot;NUMBER_OF_PROCESSORS&quot;: &quot;4&quot;,</span><br><span class="line">            &quot;OS&quot;: &quot;Windows_NT&quot;,</span><br><span class="line">            &quot;PATHEXT&quot;: &quot;.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL&quot;,</span><br><span class="line">            &quot;PROCESSOR_ARCHITECTURE&quot;: &quot;AMD64&quot;,</span><br><span class="line">            &quot;PROCESSOR_IDENTIFIER&quot;: &quot;Intel64 Family 6 Model 13 Stepping 3, GenuineIntel&quot;,</span><br><span class="line">            &quot;PROCESSOR_LEVEL&quot;: &quot;6&quot;,</span><br><span class="line">            &quot;PROCESSOR_REVISION&quot;: &quot;0d03&quot;,</span><br><span class="line">            &quot;PROMPT&quot;: &quot;$P$G&quot;,</span><br><span class="line">            &quot;PSExecutionPolicyPreference&quot;: &quot;Unrestricted&quot;,</span><br><span class="line">            &quot;PSModulePath&quot;: &quot;C:\\Users\\Administrator\\Documents\\WindowsPowerShell\\Modules;C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules&quot;,</span><br><span class="line">            &quot;PUBLIC&quot;: &quot;C:\\Users\\Public&quot;,</span><br><span class="line">            &quot;Path&quot;: &quot;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0&quot;,</span><br><span class="line">            &quot;ProgramData&quot;: &quot;C:\\ProgramData&quot;,</span><br><span class="line">            &quot;ProgramFiles&quot;: &quot;C:\\Program Files&quot;,</span><br><span class="line">            &quot;ProgramFiles(x86)&quot;: &quot;C:\\Program Files (x86)&quot;,</span><br><span class="line">            &quot;ProgramW6432&quot;: &quot;C:\\Program Files&quot;,</span><br><span class="line">            &quot;SystemDrive&quot;: &quot;C:&quot;,</span><br><span class="line">            &quot;SystemRoot&quot;: &quot;C:\\Windows&quot;,</span><br><span class="line">            &quot;TEMP&quot;: &quot;C:\\Users\\ADMINI~1\\AppData\\Local\\Temp&quot;,</span><br><span class="line">            &quot;TMP&quot;: &quot;C:\\Users\\ADMINI~1\\AppData\\Local\\Temp&quot;,</span><br><span class="line">            &quot;USERDOMAIN&quot;: &quot;WIN-J33CVNTPJ41&quot;,</span><br><span class="line">            &quot;USERNAME&quot;: &quot;Administrator&quot;,</span><br><span class="line">            &quot;USERPROFILE&quot;: &quot;C:\\Users\\Administrator&quot;,</span><br><span class="line">            &quot;windir&quot;: &quot;C:\\Windows&quot;,</span><br><span class="line">            &quot;windows_tracing_flags&quot;: &quot;3&quot;,</span><br><span class="line">            &quot;windows_tracing_logfile&quot;: &quot;C:\\BVTBin\\Tests\\installpackage\\csilogfile.log&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;ansible_fqdn&quot;: &quot;WIN-J33CVNTPJ41&quot;,</span><br><span class="line">        &quot;ansible_hostname&quot;: &quot;WIN-J33CVNTPJ41&quot;,</span><br><span class="line">        &quot;ansible_interfaces&quot;: [</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;default_gateway&quot;: &quot;42.62.9.1&quot;,</span><br><span class="line">                &quot;dns_domain&quot;: null,</span><br><span class="line">                &quot;interface_index&quot;: 11,</span><br><span class="line">                &quot;interface_name&quot;: &quot;Intel(R) PRO/1000 MT Network Connection&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;default_gateway&quot;: null,</span><br><span class="line">                &quot;dns_domain&quot;: null,</span><br><span class="line">                &quot;interface_index&quot;: 12,</span><br><span class="line">                &quot;interface_name&quot;: &quot;Intel(R) PRO/1000 MT Network Connection #2&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        &quot;ansible_ip_addresses&quot;: [</span><br><span class="line">            &quot;42.62.9.176&quot;,</span><br><span class="line">            &quot;fe80::cd71:a280:1406:de71&quot;,</span><br><span class="line">            &quot;172.16.11.176&quot;,</span><br><span class="line">            &quot;fe80::304d:48c:4d4f:67d9&quot;</span><br><span class="line">        ],</span><br><span class="line">        &quot;ansible_lastboot&quot;: &quot;2016-10-25 22:15:20Z&quot;,</span><br><span class="line">        &quot;ansible_os_family&quot;: &quot;Windows&quot;,</span><br><span class="line">        &quot;ansible_os_name&quot;: &quot;Microsoft Windows Server 2008 R2 Enterprise&quot;,</span><br><span class="line">        &quot;ansible_powershell_version&quot;: 3,</span><br><span class="line">        &quot;ansible_system&quot;: &quot;Win32NT&quot;,</span><br><span class="line">        &quot;ansible_totalmem&quot;: 8589524992,</span><br><span class="line">        &quot;ansible_uptime_seconds&quot;: 3966,</span><br><span class="line">        &quot;ansible_win_rm_certificate_expires&quot;: &quot;2017-10-24 18:26:13&quot;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;changed&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="windows-下可用的模块"><a href="#windows-下可用的模块" class="headerlink" title="windows 下可用的模块"></a>windows 下可用的模块</h2><p>与 linux 系统相比， windows 下可以使用的模块就很少了，下面是常用的一些模块</p>
+<ul>
+<li>scripts,raw,slurp,setup模块在Windows 下可正常使用</li>
+<li>win_acl (E) –设置文件/目录属主属组权限</li>
+<li>win_copy–拷贝文件到远程Windows主机</li>
+<li>win_file –创建，删除文件或目录</li>
+<li>win_lineinfile–匹配替换文件内容</li>
+<li>win_package (E) –安装/卸载本地或网络软件包</li>
+<li>win_ping –Windows系统下的ping模块，常用来测试主机是否存活</li>
+<li>win_service–管理Windows Services服务</li>
+<li>win_user –管理Windows本地用户</li>
+</ul>
+<p>更多模块介绍可以参考 <a href="http://docs.ansible.com/ansible/list_of_windows_modules.html" target="_blank" rel="noopener">ansible官网模块页面</a></p>
+<h2 id="windows-ansible-模块实践"><a href="#windows-ansible-模块实践" class="headerlink" title="windows ansible 模块实践"></a>windows ansible 模块实践</h2><h3 id="传输文件到指定目录"><a href="#传输文件到指定目录" class="headerlink" title="传输文件到指定目录"></a>传输文件到指定目录</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ansible windows -m win_copy -a &apos;src=/root/windows/files/helloworld.ps1 dest=C:/files/helloworld.ps1&apos;   </span><br><span class="line">172.16.11.176 | SUCCESS =&gt; &#123;</span><br><span class="line">    &quot;changed&quot;: true,</span><br><span class="line">    &quot;checksum&quot;: &quot;e53fa06a2ab5313165632e7c99a04af587cc6b47&quot;,</span><br><span class="line">    &quot;operation&quot;: &quot;file_copy&quot;,</span><br><span class="line">    &quot;original_basename&quot;: &quot;helloworld.ps1&quot;,</span><br><span class="line">    &quot;size&quot;: 112</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="删除指定文件"><a href="#删除指定文件" class="headerlink" title="删除指定文件"></a>删除指定文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ansible windows -m win_file -a &apos;path=c:/files/helloworld.sp1 state=absent&apos;</span><br><span class="line">172.16.11.176 | SUCCESS =&gt; &#123;</span><br><span class="line">    &quot;changed&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="执行远程脚本"><a href="#执行远程脚本" class="headerlink" title="执行远程脚本"></a>执行远程脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">ansible windows -m script -a &apos;/root/windows/files/helloworld.ps1&apos;</span><br><span class="line">172.16.11.176 | SUCCESS =&gt; &#123;</span><br><span class="line">    &quot;changed&quot;: true,</span><br><span class="line">    &quot;rc&quot;: 0,</span><br><span class="line">    &quot;stderr&quot;: &quot;&quot;,</span><br><span class="line">    &quot;stdout&quot;: &quot;\nHello World!\nGood-bye World! \n\n&quot;,</span><br><span class="line">    &quot;stdout_lines&quot;: [</span><br><span class="line">        &quot;&quot;,</span><br><span class="line">        &quot;Hello World!&quot;,</span><br><span class="line">        &quot;Good-bye World! &quot;,</span><br><span class="line">        &quot;&quot;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="用户管理"><a href="#用户管理" class="headerlink" title="用户管理"></a>用户管理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">ansible windows -m win_user -a &apos;name=Czero password=Line.kong group=Administrators&apos;   </span><br><span class="line">172.16.11.176 | SUCCESS =&gt; &#123;</span><br><span class="line">   &quot;account_disabled&quot;: false,</span><br><span class="line">   &quot;account_locked&quot;: false,</span><br><span class="line">   &quot;changed&quot;: true,</span><br><span class="line">   &quot;description&quot;: &quot;&quot;,</span><br><span class="line">   &quot;fullname&quot;: &quot;Czero&quot;,</span><br><span class="line">   &quot;groups&quot;: [],</span><br><span class="line">   &quot;name&quot;: &quot;Czero&quot;,</span><br><span class="line">   &quot;password_expired&quot;: false,</span><br><span class="line">   &quot;password_never_expires&quot;: false,</span><br><span class="line">   &quot;path&quot;: &quot;WinNT://WORKGROUP/WIN-J33CVNTPJ41/Czero&quot;,</span><br><span class="line">   &quot;sid&quot;: &quot;S-1-5-21-459422901-1284336649-1347501021-1002&quot;,</span><br><span class="line">   &quot;state&quot;: &quot;present&quot;,</span><br><span class="line">   &quot;user_cannot_change_password&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="playbook"><a href="#playbook" class="headerlink" title="playbook"></a>playbook</h3><ul>
+<li>copy 文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">vim copy.yml</span><br><span class="line">---                                                                   </span><br><span class="line">- name: copy file on windows                                          </span><br><span class="line">  hosts: windows                                                      </span><br><span class="line">  tasks:                                                              </span><br><span class="line">    - name: copy file on remote windows                               </span><br><span class="line">      win_file: src=/root/windows/files/helloworld.ps1 dest=c:/files/helloworld.ps1</span><br><span class="line"></span><br><span class="line">ansible-playbook copy.yml</span><br><span class="line"></span><br><span class="line">PLAY [copy file on windows] ****************************************************</span><br><span class="line"></span><br><span class="line">TASK [setup] *******************************************************************</span><br><span class="line">Wednesday 26 October 2016  11:38:27 +0800 (0:00:00.038)       0:00:00.038 *****</span><br><span class="line">ok: [172.16.11.176]</span><br><span class="line"></span><br><span class="line">TASK [copy file on remote windows] *********************************************</span><br><span class="line">Wednesday 26 October 2016  11:38:31 +0800 (0:00:04.071)       0:00:04.110 *****</span><br><span class="line">ok: [172.16.11.176]</span><br><span class="line"></span><br><span class="line">PLAY RECAP *********************************************************************</span><br><span class="line"></span><br><span class="line">172.16.11.176              : ok=2    changed=0    unreachable=0    failed=0   </span><br><span class="line">Wednesday 26 October 2016  11:38:33 +0800 (0:00:02.329)       0:00:06.439 *****</span><br><span class="line">===============================================================================</span><br><span class="line">setup ------------------------------------------------------------------- 4.07s</span><br><span class="line">copy file on remote windows --------------------------------------------- 2.33s</span><br></pre></td></tr></table></figure>
+<ul>
+<li>执行命令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">vim test_raw.yml</span><br><span class="line">- name: test raw module  </span><br><span class="line">  hosts: windows         </span><br><span class="line">  tasks:                 </span><br><span class="line">    - name: run ipconfig</span><br><span class="line">      raw: ipconfig      </span><br><span class="line">      register: ipconfig</span><br><span class="line">    - debug: var=ipconfig        </span><br><span class="line"></span><br><span class="line">ansible-playbook test_raw.yml</span><br><span class="line"></span><br><span class="line">PLAY [test raw module] *********************************************************</span><br><span class="line"></span><br><span class="line">TASK [setup] *******************************************************************</span><br><span class="line">Wednesday 26 October 2016  11:45:30 +0800 (0:00:00.037)       0:00:00.037 *****</span><br><span class="line">ok: [172.16.11.176]</span><br><span class="line"></span><br><span class="line">TASK [run ipconfig] ************************************************************</span><br><span class="line">Wednesday 26 October 2016  11:45:34 +0800 (0:00:04.076)       0:00:04.114 *****</span><br><span class="line">ok: [172.16.11.176]</span><br><span class="line"></span><br><span class="line">TASK [debug] *******************************************************************</span><br><span class="line">Wednesday 26 October 2016  11:45:35 +0800 (0:00:00.688)       0:00:04.803 *****</span><br><span class="line">ok: [172.16.11.176] =&gt; &#123;</span><br><span class="line">    &quot;ipconfig&quot;: &#123;</span><br><span class="line">        &quot;changed&quot;: false,</span><br><span class="line">        &quot;rc&quot;: 0,</span><br><span class="line">        &quot;stderr&quot;: &quot;&quot;,</span><br><span class="line">        &quot;stdout&quot;: &quot;\r\nWindows IP Configuration\r\n\r\n\r\nEthernet adapter �������� 2:\r\n\r\n   Connection-specific DNS Suffix  . : \r\n   Link-local IPv6 Address . . . . . : fe80::304d:48c:4d4f:67d9%12\r\n   IPv4 Address. . . . . . . . . . . : 172.16.11.176\r\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\r\n   Default Gateway . . . . . . . . . : \r\n\r\nEthernet adapter ��������:\r\n\r\n   Connection-specific DNS Suffix  . : \r\n   Link-local IPv6 Address . . . . . : fe80::cd71:a280:1406:de71%11\r\n   IPv4 Address. . . . . . . . . . . : 42.62.9.176\r\n   Subnet Mask . . . . . . . . . . . : 255.255.255.0\r\n   Default Gateway . . . . . . . . . : 42.62.9.1\r\n\r\nTunnel adapter isatap.&#123;9ED2F327-7AD8-488B-9D74-F8E3E8B5E2B1&#125;:\r\n\r\n   Media State . . . . . . . . . . . : Media disconnected\r\n   Connection-specific DNS Suffix  . : \r\n\r\nTunnel adapter isatap.&#123;AB02B80C-75A3-4F59-B19B-8AE4F8103DF8&#125;:\r\n\r\n   Media State . . . . . . . . . . . : Media disconnected\r\n   Connection-specific DNS Suffix  . : \r\n\r\nTunnel adapter 6TO4 Adapter:\r\n\r\n   Connection-specific DNS Suffix  . : \r\n   IPv6 Address. . . . . . . . . . . : 2002:2a3e:9b0::2a3e:9b0\r\n   Default Gateway . . . . . . . . . : \r\n&quot;,</span><br><span class="line">        &quot;stdout_lines&quot;: [</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;Windows IP Configuration&quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;Ethernet adapter �������� 2:&quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;   Connection-specific DNS Suffix  . : &quot;,</span><br><span class="line">            &quot;   Link-local IPv6 Address . . . . . : fe80::304d:48c:4d4f:67d9%12&quot;,</span><br><span class="line">            &quot;   IPv4 Address. . . . . . . . . . . : 172.16.11.176&quot;,</span><br><span class="line">            &quot;   Subnet Mask . . . . . . . . . . . : 255.255.255.0&quot;,</span><br><span class="line">            &quot;   Default Gateway . . . . . . . . . : &quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;Ethernet adapter ��������:&quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;   Connection-specific DNS Suffix  . : &quot;,</span><br><span class="line">            &quot;   Link-local IPv6 Address . . . . . : fe80::cd71:a280:1406:de71%11&quot;,</span><br><span class="line">            &quot;   IPv4 Address. . . . . . . . . . . : 42.62.9.176&quot;,</span><br><span class="line">            &quot;   Subnet Mask . . . . . . . . . . . : 255.255.255.0&quot;,</span><br><span class="line">            &quot;   Default Gateway . . . . . . . . . : 42.62.9.1&quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;Tunnel adapter isatap.&#123;9ED2F327-7AD8-488B-9D74-F8E3E8B5E2B1&#125;:&quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;   Media State . . . . . . . . . . . : Media disconnected&quot;,</span><br><span class="line">            &quot;   Connection-specific DNS Suffix  . : &quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;Tunnel adapter isatap.&#123;AB02B80C-75A3-4F59-B19B-8AE4F8103DF8&#125;:&quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;   Media State . . . . . . . . . . . : Media disconnected&quot;,</span><br><span class="line">            &quot;   Connection-specific DNS Suffix  . : &quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;Tunnel adapter 6TO4 Adapter:&quot;,</span><br><span class="line">            &quot;&quot;,</span><br><span class="line">            &quot;   Connection-specific DNS Suffix  . : &quot;,</span><br><span class="line">            &quot;   IPv6 Address. . . . . . . . . . . : 2002:2a3e:9b0::2a3e:9b0&quot;,</span><br><span class="line">            &quot;   Default Gateway . . . . . . . . . : &quot;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PLAY RECAP *********************************************************************</span><br><span class="line">172.16.11.176              : ok=3    changed=0    unreachable=0    failed=0   </span><br><span class="line"></span><br><span class="line">Wednesday 26 October 2016  11:45:35 +0800 (0:00:00.062)       0:00:04.866 *****</span><br><span class="line">===============================================================================</span><br><span class="line">setup ------------------------------------------------------------------- 4.08s</span><br><span class="line">run ipconfig ------------------------------------------------------------ 0.69s</span><br><span class="line">debug ------------------------------------------------------------------- 0.06s</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ansible/" rel="tag"> <i class="fa fa-tag"></i> ansible</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+               <div>
+                 
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+               </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/23/Redis/安装Redis.html" rel="next" title="安装Redis">
+                <i class="fa fa-chevron-left"></i> 安装Redis
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/08/elasticstack-standard.html" rel="prev" title="ElasticStack部署标准规范">
+                ElasticStack部署标准规范 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjY0MS8xOTE4OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/blog/avatar.jpg" alt="Cc">
+            
+              <p class="site-author-name" itemprop="name">Cc</p>
+              <p class="site-description motion-element" itemprop="description">Love Linux ♥ Love Python. 猴赛雷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Windows下Ansible工作原理"><span class="nav-number">1.</span> <span class="nav-text">Windows下Ansible工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#系统介绍"><span class="nav-number">1.1.</span> <span class="nav-text">系统介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置管理主机"><span class="nav-number">1.2.</span> <span class="nav-text">配置管理主机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-winrm-模块"><span class="nav-number">1.2.1.</span> <span class="nav-text">安装 winrm 模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动态目录的支持"><span class="nav-number">1.2.2.</span> <span class="nav-text">动态目录的支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-inventory-主机信息和group-vars-windows-yml变量信息"><span class="nav-number">1.2.3.</span> <span class="nav-text">配置 inventory 主机信息和group_vars/windows.yml变量信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#被控主机-Windows2008-R2-64"><span class="nav-number">1.3.</span> <span class="nav-text">被控主机 (Windows2008_R2_64)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Framework-3-0"><span class="nav-number">1.3.1.</span> <span class="nav-text">安装 Framework 3.0+</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置-PowerShell-本地脚本运行权限为-remotesigned"><span class="nav-number">1.3.2.</span> <span class="nav-text">设置 PowerShell 本地脚本运行权限为 remotesigned</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#升级-powershell至3-0"><span class="nav-number">1.3.3.</span> <span class="nav-text">升级 powershell至3.0+</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#验证配置"><span class="nav-number">1.4.</span> <span class="nav-text">验证配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-下可用的模块"><span class="nav-number">1.5.</span> <span class="nav-text">windows 下可用的模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#windows-ansible-模块实践"><span class="nav-number">1.6.</span> <span class="nav-text">windows ansible 模块实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#传输文件到指定目录"><span class="nav-number">1.6.1.</span> <span class="nav-text">传输文件到指定目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除指定文件"><span class="nav-number">1.6.2.</span> <span class="nav-text">删除指定文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行远程脚本"><span class="nav-number">1.6.3.</span> <span class="nav-text">执行远程脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用户管理"><span class="nav-number">1.6.4.</span> <span class="nav-text">用户管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#playbook"><span class="nav-number">1.6.5.</span> <span class="nav-text">playbook</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cc</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2017/10/24/ansible-control-windows.html'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
+</body>
+</html>

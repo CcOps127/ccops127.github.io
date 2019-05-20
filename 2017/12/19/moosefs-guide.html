@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MFS 概述MooseFS 是一款具有冗余容错功能的分布式文件系统。它把数据分散在多台服务器上，确保一份数据多个备份副本，对外提供统一的结构。 功能特性对于标准的文件操作，MooseFS 表现与其他类Unix文件系统一致。 支持的通过文件系统特性：  层次结构（目录树） 兼容 POSIX 文件属性 支持特殊文件 符号链接和硬链接 基于 IP 地址和密码的访问控制  独有特性 高可靠性(数据的多个副">
+<meta name="keywords" content="moosefs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MFS使用手册">
+<meta property="og:url" content="https://www.oneops.co/2017/12/19/moosefs-guide.html">
+<meta property="og:site_name" content="Cc&#39;s Blog">
+<meta property="og:description" content="MFS 概述MooseFS 是一款具有冗余容错功能的分布式文件系统。它把数据分散在多台服务器上，确保一份数据多个备份副本，对外提供统一的结构。 功能特性对于标准的文件操作，MooseFS 表现与其他类Unix文件系统一致。 支持的通过文件系统特性：  层次结构（目录树） 兼容 POSIX 文件属性 支持特殊文件 符号链接和硬链接 基于 IP 地址和密码的访问控制  独有特性 高可靠性(数据的多个副">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.oneops.co/images/moosefs/moosefs-network.png">
+<meta property="og:image" content="https://www.oneops.co/images/moosefs/moosefs-write-process.png">
+<meta property="og:image" content="https://www.oneops.co/images/moosefs/moosefs-read-process.png">
+<meta property="og:image" content="https://www.oneops.co/images/moosefs/mfs-topology.png">
+<meta property="og:updated_time" content="2019-05-20T06:57:34.990Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MFS使用手册">
+<meta name="twitter:description" content="MFS 概述MooseFS 是一款具有冗余容错功能的分布式文件系统。它把数据分散在多台服务器上，确保一份数据多个备份副本，对外提供统一的结构。 功能特性对于标准的文件操作，MooseFS 表现与其他类Unix文件系统一致。 支持的通过文件系统特性：  层次结构（目录树） 兼容 POSIX 文件属性 支持特殊文件 符号链接和硬链接 基于 IP 地址和密码的访问控制  独有特性 高可靠性(数据的多个副">
+<meta name="twitter:image" content="https://www.oneops.co/images/moosefs/moosefs-network.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.oneops.co/2017/12/19/moosefs-guide.html">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MFS使用手册 | Cc's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=71693959-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '71693959-4');
+</script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Cc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">生命不止 学习不息</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2017/12/19/moosefs-guide.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MFS使用手册
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-12-19 23:48:03" itemprop="dateCreated datePublished" datetime="2017-12-19T23:48:03+08:00">2017-12-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-05-20 14:57:34" itemprop="dateModified" datetime="2019-05-20T14:57:34+08:00">2019-05-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="MFS-概述"><a href="#MFS-概述" class="headerlink" title="MFS 概述"></a>MFS 概述</h1><p>MooseFS 是一款具有冗余容错功能的分布式文件系统。它把数据分散在多台服务器上，确保一份数据多个备份副本，对外提供统一的结构。</p>
+<h2 id="功能特性"><a href="#功能特性" class="headerlink" title="功能特性"></a>功能特性</h2><p>对于标准的文件操作，MooseFS 表现与其他类Unix文件系统一致。 支持的通过文件系统特性：</p>
+<ul>
+<li>层次结构（目录树）</li>
+<li>兼容 POSIX 文件属性</li>
+<li>支持特殊文件</li>
+<li>符号链接和硬链接</li>
+<li>基于 IP 地址和密码的访问控制</li>
+</ul>
+<h2 id="独有特性"><a href="#独有特性" class="headerlink" title="独有特性"></a>独有特性</h2><ul>
+<li>高可靠性(数据的多个副本存储在不同服务器)</li>
+<li>容量动态扩展（添加新硬盘或者服务器）</li>
+<li>可以回收在制定时间内删除的文件，类似回收站功能</li>
+<li>可以对整个文件甚至是正在被写入的文件创建文件快照</li>
+</ul>
+<a id="more"></a>
+<h2 id="MFS整体架构的四种角色"><a href="#MFS整体架构的四种角色" class="headerlink" title="MFS整体架构的四种角色"></a>MFS整体架构的四种角色</h2><ul>
+<li><p>Master（元数据服务器） 负责各个数据存储服务器的管理，文件读写调度，文件空间回收以及恢复，多节点拷贝。</p>
+</li>
+<li><p>Metalogger（元数据日志服务器） 负责备份Master服务器的changelog。文件类型为 <code>changelog.*.mfs</code>，以便在 Master 出问题时接替其工作</p>
+</li>
+<li><p>Chunk（数据存储服务器） 负责连接 Master，听从 Master 调度，提供存储空间，并为客户端提供数据传输</p>
+</li>
+<li><p>Client（客户端挂载） 通过FUSE内核接口挂载远程管理服务器（master）上所管理的数据存储服务器，使用起来和本地文件系统一样</p>
+</li>
+</ul>
+<h2 id="MFS工作图解"><a href="#MFS工作图解" class="headerlink" title="MFS工作图解"></a>MFS工作图解</h2><ul>
+<li>网络架构</li>
+</ul>
+<p><img src="https://www.oneops.co/images/moosefs/moosefs-network.png" alt="MooseFS-NetWork.png" title="MooseFS-NetWork"></p>
+<ul>
+<li>工作原理</li>
+</ul>
+<p><img src="https://www.oneops.co/images/moosefs/moosefs-write-process.png" alt="moosefs-write-process.png" title="MooseFS Write Process"></p>
+<p><img src="https://www.oneops.co/images/moosefs/moosefs-read-process.png" alt="moosefs-read-process.png" title="MooseFS Read Process"></p>
+<ul>
+<li>集群拓扑</li>
+</ul>
+<p><img src="https://www.oneops.co/images/moosefs/mfs-topology.png" alt="mfs-topology.png" title="MooseFS-Topology"></p>
+<hr>
+<h1 id="安装配置-MFS"><a href="#安装配置-MFS" class="headerlink" title="安装配置 MFS"></a>安装配置 MFS</h1><h2 id="系统环境介绍"><a href="#系统环境介绍" class="headerlink" title="系统环境介绍"></a>系统环境介绍</h2><ul>
+<li>OS：<code>CentOS Linux release 7.2.1511 (Core)</code></li>
+<li>软件版本：2.0.81-1</li>
+<li>节点配置</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>ip地址</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>172.16.18.137</td>
+<td>master</td>
+</tr>
+<tr>
+<td>172.16.18.134</td>
+<td>metalogger</td>
+</tr>
+<tr>
+<td>172.16.18.183</td>
+<td>chunk</td>
+</tr>
+<tr>
+<td>172.16.18.184</td>
+<td>chunk</td>
+</tr>
+<tr>
+<td>172.16.18.185</td>
+<td>chunk</td>
+</tr>
+<tr>
+<td>172.16.18.186</td>
+<td>chunk</td>
+</tr>
+<tr>
+<td>172.16.18.187</td>
+<td>chunk</td>
+</tr>
+</tbody>
+</table>
+<p>chunk 上有四块硬盘，第一块为系统，剩下三块作为数据存储，每块容量为4TB</p>
+<h2 id="软件安装"><a href="#软件安装" class="headerlink" title="软件安装"></a>软件安装</h2><h3 id="从官方软件库安装MFS"><a href="#从官方软件库安装MFS" class="headerlink" title="从官方软件库安装MFS"></a>从官方软件库安装MFS</h3><ul>
+<li>添加yum key</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl &quot;http://ppa.moosefs.com/RPM-GPG-KEY-MooseFS&quot; &gt; /etc/pki/rpm-gpg/RPM-GPG-KEY-MooseFS</span><br></pre></td></tr></table></figure>
+<ul>
+<li>下载软件库配置文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//For EL7 family:</span><br><span class="line">curl &quot;http://ppa.moosefs.com/MooseFS-stable-el7.repo&quot; &gt; /etc/yum.repos.d/MooseFS.repo</span><br><span class="line"></span><br><span class="line">//For EL6 family:</span><br><span class="line">curl &quot;http://ppa.moosefs.com/MooseFS-stable-el6.repo&quot; &gt; /etc/yum.repos.d/MooseFS.repo</span><br><span class="line"></span><br><span class="line">For EL5 family:</span><br><span class="line">Due to GPGv4 incompatibility with CentOS 5, CentOS 5 is deprecated.</span><br><span class="line">If you really need CentOS 5 packages, please contact support@moosefs.com.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装软件包</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// For Master Server:</span><br><span class="line">yum install moosefs-master moosefs-cli moosefs-cgi moosefs-cgiserv</span><br><span class="line"></span><br><span class="line">// For Chunkservers:</span><br><span class="line">yum install moosefs-chunkserver</span><br><span class="line"></span><br><span class="line">//For Metaloggers:</span><br><span class="line">yum install moosefs-metalogger</span><br><span class="line"></span><br><span class="line">For Clients:</span><br><span class="line">//yum install moosefs-client</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动服务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//To start process manually:</span><br><span class="line">mfsmaster start</span><br><span class="line">mfschunkserver start</span><br><span class="line"></span><br><span class="line">//For systemd OS family - EL7:</span><br><span class="line">systemctl start moosefs-master.service</span><br><span class="line">systemctl start moosefs-chunkserver.service</span><br><span class="line"></span><br><span class="line">//For SysV OS family - EL6:</span><br><span class="line">service moosefs-master start</span><br><span class="line">service moosefs-chunkserver start</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="从源码安装MFS"><a href="#从源码安装MFS" class="headerlink" title="从源码安装MFS"></a>从源码安装MFS</h3><ul>
+<li>下载软件包</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://ppa.moosefs.com/src/moosefs-2.0.88-1.tar.gz</span><br></pre></td></tr></table></figure>
+<ul>
+<li>添加用户和组</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd -s /sbin/nologin  -M mfs</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装软件包</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">tar-zxf moosefs-2.0.88-1.tar.gz</span><br><span class="line">cd moosefs-2.0.88</span><br><span class="line"></span><br><span class="line">// For master</span><br><span class="line">./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs --disable-mfschunkserver --disable-mfsmount</span><br><span class="line"></span><br><span class="line">// For metalogger</span><br><span class="line">./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs --disable-mfschunkserver --disable-mfsmount</span><br><span class="line"></span><br><span class="line">// For chunk</span><br><span class="line">./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs --disable-mfsmaster --disable-mfsmount --disable-mfscgi --disable-mfscgiserv</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装MFS client</li>
+</ul>
+<p>client安装需要 fuse 支持，fuse 可以从源码和仓库中安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs --disable-mfsmaster --disable-mfschunkserver --disable-mfscgi --disable-mfscgiserv</span><br></pre></td></tr></table></figure>
+<h2 id="配置MFS"><a href="#配置MFS" class="headerlink" title="配置MFS"></a>配置MFS</h2><h3 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h3><ul>
+<li>配置文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">// mfsmaster.cfg</span><br><span class="line"># WORKING_USER = mfs 运行 master server 的用户</span><br><span class="line"># WORKING_GROUP = mfs 运行 master server 的组</span><br><span class="line"># SYSLOG_IDENT = mfsmaster master server 在 syslog中的标识，说明是由 master serve 产生的</span><br><span class="line"># LOCK_MEMORY = 0 是否执行 mlockall()以避免 mfsmaster 进程溢出（默认为 0）</span><br><span class="line"># NICE_LEVEL = -19 运行的优先级(如果可以默认是 -19; 注意: 进程必须是用 root启动)</span><br><span class="line"></span><br><span class="line"># EXPORTS_FILENAME = /usr/local/mfs/etc/mfsexports.cfg 被挂接目录及其权限控制文件的存放位置</span><br><span class="line"></span><br><span class="line"># TOPOLOGY_FILENAME = /usr/local/mfs/etc/mfs/mfstopology.cfg</span><br><span class="line"></span><br><span class="line"># DATA_PATH = /usr/local/mfs/var/mfs 数据存放路径，此目录下大致有三类文件，changelog，sessions和 stats；</span><br><span class="line"></span><br><span class="line"># BACK_LOGS = 50 metadata 的改变 log 文件数目(默认是 50);</span><br><span class="line"># BACK_META_KEEP_PREVIOUS = 1</span><br><span class="line"></span><br><span class="line"># REPLICATIONS_DELAY_INIT = 300 延迟复制的时间（默认是 300s）;</span><br><span class="line"># REPLICATIONS_DELAY_DISCONNECT = 3600 chunkserver 断开的复制延迟（默认是 3600）；</span><br><span class="line"></span><br><span class="line"># MATOML_LISTEN_HOST = * metalogger 监听的 IP 地址(默认是*，代表任何 IP)；</span><br><span class="line"># MATOML_LISTEN_PORT = 9419 metalogger 监听的端口地址(默认是 9419)；</span><br><span class="line"># MATOML_LOG_PRESERVE_SECONDS = 600</span><br><span class="line"></span><br><span class="line"># MATOCS_LISTEN_HOST = * 用于 chunkserver 连接的 IP 地址（默认是*，代表任何 IP）；</span><br><span class="line"># MATOCS_LISTEN_PORT = 9420 用于 chunkserver 连接的端口地址（默认是 9420）；</span><br><span class="line"></span><br><span class="line"># MATOCU_LISTEN_HOST = * 用于客户端挂接连接的 IP 地址(默认是*，代表任何 IP)；</span><br><span class="line"># MATOCU_LISTEN_PORT = 9421 用于客户端挂接连接的端口地址（默认是 9421）；</span><br><span class="line"></span><br><span class="line"># CHUNKS_LOOP_MAX_CPS = 100000</span><br><span class="line"># CHUNKS_LOOP_MIN_TIME = 300 chunks 的回环频率（默认是：300 秒）；</span><br><span class="line">注：原文为Chunks loop frequency in seconds (default is 300)</span><br><span class="line"></span><br><span class="line"># CHUNKS_SOFT_DEL_LIMIT = 10</span><br><span class="line"># CHUNKS_HARD_DEL_LIMIT = 25</span><br><span class="line"># CHUNKS_WRITE_REP_LIMIT = 2</span><br><span class="line"># CHUNKS_READ_REP_LIMIT = 10</span><br><span class="line"># ACCEPTABLE_DIFFERENCE = 0.1</span><br><span class="line"></span><br><span class="line"># SESSION_SUSTAIN_TIME = 86400</span><br><span class="line"># REJECT_OLD_CLIENTS = 0 弹出低于 1.6.0 的客户端挂接（0 或 1，默认是 0）注意mfsexports 访问控制对于那些老客户是没用的</span><br><span class="line"># deprecated:</span><br><span class="line"># CHUNKS_DEL_LIMIT - use CHUNKS_SOFT_DEL_LIMIT instead</span><br><span class="line"># LOCK_FILE - lock system has been changed, and this option is used only to search for old lockfile</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">\\ mfsexport.cfg</span><br><span class="line">#* / ro</span><br><span class="line">#192.168.1.0/24 / rw</span><br><span class="line">#192.168.1.0/24 / rw,alldirs,maproot=0,password=passcode</span><br><span class="line">#10.0.0.0-10.0.0.5 /test rw,maproot=nobody,password=test</span><br><span class="line">* . rw</span><br><span class="line">#* / rw,alldirs,maproot=0</span><br><span class="line">172.16.18.221          .               rw                             \\ 回收站</span><br><span class="line">172.16.18.221          /               rw,alldirs,maproot=0</span><br><span class="line">172.16.18.134          /               rw,alldirs,maproot=0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改配置文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd /usr/local/mfs/etc/</span><br><span class="line">mv mfsmaster.cfg.dist mfsmaster.cfg</span><br><span class="line">mv mfsexports.cfg.dist mfsexports.cfg</span><br></pre></td></tr></table></figure>
+<p>mfsmaster.cfg : master的主配置文件，配置文件中所有的选项都是用#注释掉的，这代表的是将会使用的选项的默认参数，如果要修改只需取消注释修改其值为你所要使用的值即可；</p>
+<p>mfsexportes.cfg 为共享mfs文件系统的控制文件，NFS要共享一个目录时，我们会使用vim /etc/exports命令，编写共享给谁，所要共享的目录，共享出去的属性这些内容，而mfsexports.cfg的作用与其类似其书写格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">client        Directory            Property</span><br><span class="line">*                /           rw,alldirs,maproot=0</span><br><span class="line">client支持格式：ip、ip/netmask、ip/位数掩码、ip-ip、*</span><br></pre></td></tr></table></figure>
+<p>该文件每一个条目分为三部分： 第一部分：客户端的ip 地址 第二部分：被挂接的目录 第三部分：客户端拥有的权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">//地址可以指定的几种表现形式：</span><br><span class="line">* 所有的ip 地址</span><br><span class="line">n.n.n.n 单个ip 地址</span><br><span class="line">n.n.n.n/b IP 网络地址/位数掩码</span><br><span class="line">n.n.n.n/m.m.m.m IP 网络地址/子网掩码</span><br><span class="line">f.f.f.f-t.t.t.t IP 段</span><br><span class="line"></span><br><span class="line">//目录部分需要注意两点：</span><br><span class="line">/ 标识MooseFS 根;</span><br><span class="line">. 表示MFSMETA 文件系统</span><br><span class="line"></span><br><span class="line">//权限部分：</span><br><span class="line">ro 只读模式共享</span><br><span class="line">rw 读写的方式共享</span><br><span class="line">alldirs 许挂载任何指定的子目录</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动服务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/mfs/sbin/mfsmaster start</span><br><span class="line"></span><br><span class="line">//为了监控moosefs的当前运行状态，我们可以运行cgi服务，这样就可以用浏览器查看整个moosefs的运行情况</span><br><span class="line">/usr/local/mfs/sbin/mfscgiserv</span><br></pre></td></tr></table></figure>
+<h3 id="Metalogger"><a href="#Metalogger" class="headerlink" title="Metalogger"></a>Metalogger</h3><ul>
+<li>修改配置文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mv mfsmetalogger.cfg.dist mfsmetalogger.cfg</span><br><span class="line"></span><br><span class="line">META_DOWNLOAD_FREQ = 24 \\元数据备份下载请求频率，设置为1小时</span><br><span class="line">MASTER_HOST = 172.16.18.137 \\修改MASTER_HOST的值，为MASTER_HOST的ip地址</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动服务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/mfs/sbin/mfsmetalogger start</span><br></pre></td></tr></table></figure>
+<h3 id="ChunkServer"><a href="#ChunkServer" class="headerlink" title="ChunkServer"></a>ChunkServer</h3><ul>
+<li>配置分区</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">parted -s /dev/sdb &apos;mklabel gpt&apos;;parted -s /dev/sdc &apos;mklabel gpt&apos;;parted -s /dev/sdd &apos;mklabel gpt&apos;</span><br><span class="line">parted -s /dev/sdb  &apos;mkpart primary 0 -1&apos;; parted -s /dev/sdc  &apos;mkpart primary 0 -1&apos;; parted -s /dev/sdd &apos;mkpart primary 0 -1&apos;</span><br><span class="line">mkfs.ext4 -q -T largefile /dev/sdb1;mkfs.ext4 -q -T largefile /dev/sdc1;mkfs.ext4 -q -T largefile /dev/sdd1</span><br><span class="line">mkdir /MFS_data&#123;1,2,3&#125;  </span><br><span class="line">mount /dev/sdb1 /MFS_data1; mount /dev/sdc1 /MFS_data2; mount /dev/sdd1 /MFS_data3</span><br><span class="line">chown mfs:mfs /MFS_data*</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改配置文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mv mfschunkserver.cfg.dist mfschunkserver.cfg</span><br><span class="line">修改MASTER_HOST的值，为MASTER_HOST的ip地址：</span><br><span class="line">MASTER_HOST = 172.16.18.137</span><br><span class="line"></span><br><span class="line">mv mfshdd.cfg.dist mfshdd.cfg</span><br><span class="line">增加挂载目录信息</span><br><span class="line">/MFS_data1</span><br><span class="line">/MFS_data2</span><br><span class="line">/MFS_data3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动服务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/mfs/sbin/mfschunkserver start</span><br></pre></td></tr></table></figure>
+<h3 id="Client"><a href="#Client" class="headerlink" title="Client"></a>Client</h3><ul>
+<li>挂载 MFS</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir /MFS_data</span><br><span class="line">/usr/local/mfs/bin/mfsmount /MFS_data -H 172.16.18.137</span><br><span class="line">mfsmaster accepted connection with parameters: read-write,restricted_ip ; root mapped to root:root</span><br></pre></td></tr></table></figure>
+<p>特别需要注意的是，所有的MFS 都是挂接同一个元数据服务器 master 的 IP ,而不是其他数据存储 服务器 chunkserver 的 IP</p>
+<hr>
+<h1 id="使用MFS"><a href="#使用MFS" class="headerlink" title="使用MFS"></a>使用MFS</h1><h2 id="MFS文件系统使用"><a href="#MFS文件系统使用" class="headerlink" title="MFS文件系统使用"></a>MFS文件系统使用</h2><p>Client通过MFS软件提供的工具来管理MFS文件系统，下面是工具介绍</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/mfs/bin/mfstools -h</span><br><span class="line">mfs multi tool</span><br><span class="line"></span><br><span class="line">usage:</span><br><span class="line">        mfstools create - create symlinks (mfs&lt;toolname&gt; -&gt; /usr/local/mfs/bin/mfstools)</span><br><span class="line"></span><br><span class="line">tools:</span><br><span class="line">        mfsgetgoal                               // 设定副本数</span><br><span class="line">        mfssetgoal                               // 获取副本数</span><br><span class="line">        mfsgettrashtime                          // 设定回收站时间</span><br><span class="line">        mfssettrashtime                          // 设定回收站时间</span><br><span class="line">        mfscheckfile                             // 检查文件</span><br><span class="line">        mfsfileinfo                              // 文件信息</span><br><span class="line">        mfsappendchunks                            </span><br><span class="line">        mfsdirinfo                                // 目录信息</span><br><span class="line">        mfsfilerepair                             // 文件修复</span><br><span class="line">        mfsmakesnapshot                           // 快照     </span><br><span class="line">        mfsgeteattr                               // 设置权限</span><br><span class="line">        mfsseteattr</span><br><span class="line">        mfsdeleattr</span><br><span class="line"></span><br><span class="line">deprecated tools:                                  // 递归设置</span><br><span class="line">        mfsrgetgoal = mfsgetgoal -r</span><br><span class="line">        mfsrsetgoal = mfssetgoal -r</span><br><span class="line">        mfsrgettrashtime = mfsgettreshtime -r</span><br><span class="line">        mfsrsettrashtime = mfssettreshtime -r</span><br></pre></td></tr></table></figure>
+<h3 id="挂载文件系统"><a href="#挂载文件系统" class="headerlink" title="挂载文件系统"></a>挂载文件系统</h3><p>MooseFS 文件系统利用下面的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mfsmount mountpoint [-d][-f] [-s][-m] [-n][-p] [-HMASTER][-PPORT] [-S PATH][-o OPT[,OPT...]]</span><br><span class="line">-H MASTER：是管理服务器（master server）的ip 地址</span><br><span class="line">-P PORT： 是管理服务器（ master server）的端口号，要按照mfsmaster.cfg 配置文件中的变量</span><br><span class="line">MATOCU_LISTEN_POR 的之填写。如果master serve 使用的是默认端口号则不用指出。</span><br><span class="line">-S PATH：指出被挂接mfs 目录的子目录，默认是/目录，就是挂载整个mfs 目录。</span><br></pre></td></tr></table></figure>
+<p>Mountpoint：是指先前创建的用来挂接 mfs 的目录。 在开始 mfsmount 进程时，用一个<code>-m</code> 或<code>-o mfsmeta</code> 的选项，这样可以挂接一个辅助的文件系统 MFSMETA，这么做的目的是对于意外的从 MooseFS 卷上删除文件或者是为了释放磁盘空间而移动的文件而又此文件又过去了垃圾文件存放期的恢复，例如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/mfs/bin/mfsmount -m /MFS_meta/ -H 172.16.18.137</span><br></pre></td></tr></table></figure>
+<h3 id="设定副本数量"><a href="#设定副本数量" class="headerlink" title="设定副本数量"></a>设定副本数量</h3><p>目标（goal），是指文件被拷贝副本的份数，设定了拷贝的份数后是可以通过mfsgetgoal 命令来证实的，也可以通过mfsrsetgoal 来改变设定。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mfssetgoal 3 /MFS_data/test/</span><br><span class="line">mfssetgoal 3 /MFS_data/test/</span><br></pre></td></tr></table></figure>
+<p>用<code>mfsgetgoal -r</code> 和<code>mfssetgoal -r</code> 同样的操作可以对整个树形目录递归操作，其等效于<code>mfsrsetgoal</code>命令。实际的拷贝份数可以通过<code>mfscheckfile</code> 和<code>mfsfile info</code>命令来证实。</p>
+<p><strong>注意以下几种特殊情况：</strong></p>
+<ul>
+<li>一个不包含数据的零长度的文件,尽管没有设置为非零的目标（the non-zero “goal”）,但用mfscheckfile 命令查询将返回一个空的结果；将文件填充内容后，其会根据设置的goal创建副本；这时再将文件清空，其副本依然作为空文件存在。</li>
+<li>假如改变一个已经存在的文件的拷贝个数，那么文件的拷贝份数将会被扩大或者被删除，这个过程会有延时。可以通过mfscheckfile 命令来证实。</li>
+<li>对一个目录设定”目标”，此目录下的新创建文件和子目录均会继承此目录的设定，但不会改变已经存在的文件及目录的拷贝份数。</li>
+</ul>
+<p>可以通过mfsdirinfo来查看整个目录树的信息摘要。</p>
+<h3 id="垃圾回收站"><a href="#垃圾回收站" class="headerlink" title="垃圾回收站"></a>垃圾回收站</h3><p>一个被删除文件能够存放在一个 “垃圾箱” 的时间就是一个隔离时间， 这个时间可以用<code>mfsgettrashtime</code> 命令来验证，也可以使用<code>mfssettrashtime 命令来设置</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mfssettrashtime 64800 /MFS_data/test/test1</span><br><span class="line">mfsgettrashtime /MFS_data/test/test1</span><br></pre></td></tr></table></figure>
+<p>时间的单位是秒(有用的值有:1 小时是3600 秒,24 - 86400 秒,1天 - 604800 秒)。就像文件被存储的份数一样, 为一个目录设定存放时间是要被新创建的文件和目录所继承的。数字0 意味着一个文件被删除后, 将立即被彻底删除，在想回收是不可能的。</p>
+<p>删除文件可以通过一个单独安装MFSMETA 文件系统。特别是它包含目录/ trash (包含任然可以被还原的被删除文件的信息)和/ trash/undel (用于获取文件)。只有管理员有权限访问MFSMETA(用户的uid 0，通常是root)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/mfs/bin/mfsmount -m /MFS_meta/ -H 172.16.18.137</span><br></pre></td></tr></table></figure>
+<p>被删文件的文件名在”垃圾箱”目录里还可见,文件名由一个八位十六进制的数 i-node 和被删文件的文件名组成，在文件名和 i-node 之间不是用”/“,而是用了”|”替代。如果一个文件名的长度超过操作系统的限制（通常是255 个字符），那么部分将被删除。通过从挂载点起全路径的文件名被删除的文件任然可以被读写。</p>
+<p>移动这个文件到 trash/undel 子目录下，将会使原始的文件恢复到正确的 MooseFS 文件系统上路径下（如果路径没有改变）。如果在同一路径下有个新的同名文件，那么恢复不会成功。</p>
+<p>从”垃圾箱”中删除文件结果是释放之前被它站用的空间(删除有延迟,数据被异步删除)。</p>
+<p>在MFSMETA中还有另一个目录reserved，该目录内的是被删除但依然打开的文件。在用户关闭了这些被打开的文件后，reserved 目录中的文件将被删除，文件的数据也将被立即删除。在reserved 目录中文件的命名方法同trash 目录中的一样，但是不能有其他功能的操作。</p>
+<h3 id="快照snapshot"><a href="#快照snapshot" class="headerlink" title="快照snapshot"></a>快照snapshot</h3><p>MooseFS 系统的另一个特征是利用 mfsmakesnapshot 工具给文件或者是目录树做快照</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mfsmakesnapshot source ... destination</span><br></pre></td></tr></table></figure>
+<p>Mfsmakesnapshot 是在一次执行中整合了一个或是一组文件的拷贝，而且任何修改这些文件的源文件都不会影响到源文件的快照， 就是说任何对源文件的操作,例如写入源文件，将不会修改副本(或反之亦然)。 也可以使用mfsappendchunks：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mfsappendchunks destination-file source-file ...</span><br></pre></td></tr></table></figure>
+<p>当有多个源文件时，它们的快照被加入到同一个目标文件中（每个chunk 的最大量是 chunk）。</p>
+<h2 id="MFS集群维护"><a href="#MFS集群维护" class="headerlink" title="MFS集群维护"></a>MFS集群维护</h2><h3 id="启动MFS集群"><a href="#启动MFS集群" class="headerlink" title="启动MFS集群"></a>启动MFS集群</h3><p>安全的启动MooseFS 集群（避免任何读或写的错误数据或类似的问题）的方式是按照以下命令步骤：</p>
+<ol>
+<li>启动mfsmaster 进程</li>
+<li>启动所有的mfschunkserver 进程</li>
+<li>启动mfsmetalogger 进程（如果配置了mfsmetalogger）</li>
+<li>当所有的chunkservers 连接到MooseFS master 后，任何数目的客户端可以利用mfsmount 去挂接被export 的文件系统。（可以通过检查master 的日志或是CGI 监视器来查看是否所有的chunkserver被连接）。</li>
+</ol>
+<h3 id="停止MFS集群"><a href="#停止MFS集群" class="headerlink" title="停止MFS集群"></a>停止MFS集群</h3><p>安全的停止MooseFS 集群：</p>
+<ol>
+<li>在所有的客户端卸载MooseFS 文件系统（用umount 命令或者是其它等效的命令）</li>
+<li>用mfschunkserver stop 命令停止chunkserver 进程</li>
+<li>用mfsmetalogger stop 命令停止metalogger 进程</li>
+<li>用mfsmaster stop 命令停止master 进程</li>
+</ol>
+<h3 id="Chunkservers-的维护"><a href="#Chunkservers-的维护" class="headerlink" title="Chunkservers 的维护"></a>Chunkservers 的维护</h3><p>若每个文件的goal（目标）都不小于2，并且没有under-goal 文件（这些可以用mfsgetgoal –r和mfsdirinfo 命令来检查），那么一个单一的chunkserver 在任何时刻都可能做停止或者是重新启动。以后每当需要做停止或者是重新启动另一个chunkserver 的时候，要确定之前的chunkserver 被连接，而且要没有under-goal chunks。</p>
+<h3 id="MFS元数据备份"><a href="#MFS元数据备份" class="headerlink" title="MFS元数据备份"></a>MFS元数据备份</h3><p>通常元数据有两部分的数据：</p>
+<ul>
+<li>主要元数据文件metadata.mfs，当mfsmaster 运行的时候会被命名为 metadata.mfs.back</li>
+<li>元数据改变日志changelog.<code>*.mfs</code>，存储了过去的N 小时的文件改变（N 的数值是由BACK_LOGS参数设置的，参数的设置在mfschunkserver.cfg 配置文件中）。</li>
+</ul>
+<p>主要的元数据文件需要定期备份，备份的频率取决于取决于多少小时changelogs 储存。元数据changelogs 实时的自动复制。1.6版本中这个工作都由metalogger完成。</p>
+<h3 id="MFS-Master的恢复"><a href="#MFS-Master的恢复" class="headerlink" title="MFS Master的恢复"></a>MFS Master的恢复</h3><p>一旦mfsmaster 崩溃（例如因为主机或电源失败），需要最后一个元数据日志changelog 并入主要的metadata 中。这个操作时通过<code>mfsmetarestore</code>工具做的，最简单的方法是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mfsmetarestore -a</span><br></pre></td></tr></table></figure>
+<p>如果master 数据被存储在MooseFS 编译指定地点外的路径，则要利用-d 参数指定使用，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mfsmetarestore -a -d /opt/mfsmaster</span><br></pre></td></tr></table></figure>
+<h3 id="从-MetaLogger-中恢复-Master"><a href="#从-MetaLogger-中恢复-Master" class="headerlink" title="从 MetaLogger 中恢复 Master"></a>从 MetaLogger 中恢复 Master</h3><p>如果 <code>mfsmetarestore -a</code> 无法修复，则使用 metalogger 也可能无法修复，暂时没遇到过这种情况，这里不暂不考虑。</p>
+<ol>
+<li>找回 metadata.mfs.back 文件，可以从备份中找，也可以中 metalogger 主机中找（如果启动了 metalogger 服务），然后把 metadata.mfs.back 放入 data 目录，一般为<code>{prefix}/var/mfs</code></li>
+<li>从在 master 宕掉之前的任何运行 metalogger 服务的服务器上拷贝最后 metadata 文件，然后放入 mfsmaster 的数据目录。</li>
+<li>利用 mfsmetarestore 命令合并元数据 changelogs，可以用自动恢复模式<code>mfsmetarestore -a</code>，也可以利用非自动化恢复模式</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mfsmetarestore -m metadata.mfs.back -o metadata.mfs changelog_ml.*.mfs</span><br></pre></td></tr></table></figure>
+<p>或：强制使用 metadata.mfs.back 创建 metadata.mfs，可以启动 master，但丢失的数据暂无法确定。</p>
+<h3 id="Automated-Failover"><a href="#Automated-Failover" class="headerlink" title="Automated Failover"></a>Automated Failover</h3><p>生产环境使用 MooseFS 时，需要保证 master 节点的高可用。 使用 <code>ucarp</code> 是一种比较成熟的方案，或者DRBD+[hearbeat|keepalived]。<code>ucarp</code> 类似于 <code>keepalived</code>，通过主备服务器间的健康检查来发现集群状态，并执行相应操作。另外 MooseFS商业版本已经支持双主配置，解决单点故障。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/moosefs/" rel="tag"> <i class="fa fa-tag"></i> moosefs</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+               <div>
+                 
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+               </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/19/centos-install-kvm.html" rel="next" title="CentOS6.5安装KVM">
+                <i class="fa fa-chevron-left"></i> CentOS6.5安装KVM
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/19/install-glusterfs.html" rel="prev" title="GlusterFS部署详解">
+                GlusterFS部署详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjY0MS8xOTE4OA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/blog/avatar.jpg" alt="Cc">
+            
+              <p class="site-author-name" itemprop="name">Cc</p>
+              <p class="site-description motion-element" itemprop="description">Love Linux ♥ Love Python. 猴赛雷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MFS-概述"><span class="nav-number">1.</span> <span class="nav-text">MFS 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#功能特性"><span class="nav-number">1.1.</span> <span class="nav-text">功能特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#独有特性"><span class="nav-number">1.2.</span> <span class="nav-text">独有特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MFS整体架构的四种角色"><span class="nav-number">1.3.</span> <span class="nav-text">MFS整体架构的四种角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MFS工作图解"><span class="nav-number">1.4.</span> <span class="nav-text">MFS工作图解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装配置-MFS"><span class="nav-number">2.</span> <span class="nav-text">安装配置 MFS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#系统环境介绍"><span class="nav-number">2.1.</span> <span class="nav-text">系统环境介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件安装"><span class="nav-number">2.2.</span> <span class="nav-text">软件安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从官方软件库安装MFS"><span class="nav-number">2.2.1.</span> <span class="nav-text">从官方软件库安装MFS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从源码安装MFS"><span class="nav-number">2.2.2.</span> <span class="nav-text">从源码安装MFS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置MFS"><span class="nav-number">2.3.</span> <span class="nav-text">配置MFS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Master"><span class="nav-number">2.3.1.</span> <span class="nav-text">Master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Metalogger"><span class="nav-number">2.3.2.</span> <span class="nav-text">Metalogger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ChunkServer"><span class="nav-number">2.3.3.</span> <span class="nav-text">ChunkServer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Client"><span class="nav-number">2.3.4.</span> <span class="nav-text">Client</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用MFS"><span class="nav-number">3.</span> <span class="nav-text">使用MFS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MFS文件系统使用"><span class="nav-number">3.1.</span> <span class="nav-text">MFS文件系统使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#挂载文件系统"><span class="nav-number">3.1.1.</span> <span class="nav-text">挂载文件系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设定副本数量"><span class="nav-number">3.1.2.</span> <span class="nav-text">设定副本数量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#垃圾回收站"><span class="nav-number">3.1.3.</span> <span class="nav-text">垃圾回收站</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快照snapshot"><span class="nav-number">3.1.4.</span> <span class="nav-text">快照snapshot</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MFS集群维护"><span class="nav-number">3.2.</span> <span class="nav-text">MFS集群维护</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动MFS集群"><span class="nav-number">3.2.1.</span> <span class="nav-text">启动MFS集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#停止MFS集群"><span class="nav-number">3.2.2.</span> <span class="nav-text">停止MFS集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Chunkservers-的维护"><span class="nav-number">3.2.3.</span> <span class="nav-text">Chunkservers 的维护</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MFS元数据备份"><span class="nav-number">3.2.4.</span> <span class="nav-text">MFS元数据备份</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MFS-Master的恢复"><span class="nav-number">3.2.5.</span> <span class="nav-text">MFS Master的恢复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从-MetaLogger-中恢复-Master"><span class="nav-number">3.2.6.</span> <span class="nav-text">从 MetaLogger 中恢复 Master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Automated-Failover"><span class="nav-number">3.2.7.</span> <span class="nav-text">Automated Failover</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cc</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2017/12/19/moosefs-guide.html'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
+</body>
+</html>
