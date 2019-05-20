@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://www.oneops.co/categories/index.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.630Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/schedule/index.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.630Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/02/27/python-use-wechat-alarm.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/04/28/python-debugtools-pysnooper.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/05/20/use-etcd.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/05/20/getting-started-etcd.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/02/25/etcd-discovery.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/02/22/static-etcd.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/03/05/tls-etcd.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/05/06/python-100-day02.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/05/05/python-100-day01.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/baidu_verify_D9egdwp9U7.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/googled18515fcec64d15c.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/tags/index.html</loc>
+    
+    <lastmod>2019-05-20T06:57:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/04/22/12-factor-app.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.010Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/23/Redis/%E5%AE%89%E8%A3%85Redis.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.010Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/apache-add-mod_cgi.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.010Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/nginx-access-control.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.010Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/06/14/not-root-use-docker.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/19/centos7-elasticstack.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/11/08/elasticstack-standard.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/04/09/elasticsearch-performance-improvement.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-elasticsearch.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-filebeat.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-kibana.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-logstash.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/centos-install-kvm.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/fishshell.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/14/autojump.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/03/07/shadowsocks-vpn.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/03/08/proxychains-ng.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/23/mariadb-install.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/23/mariadb-master-slave.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/23/mysql-clean-binlog.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/23/mysql-client-mycli.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/24/ansible-control-windows.html</loc>
+    
+    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/01/10/use-consul.html</loc>
+    
+    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/01/10/consul-guide.html</loc>
+    
+    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/01/10/consul-nginx.html</loc>
+    
+    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/glusterfs.html</loc>
+    
+    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/install-glusterfs.html</loc>
+    
+    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/moosefs-guide.html</loc>
+    
+    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
+    
+  </url>
+  
+</urlset>
