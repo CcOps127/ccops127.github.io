@@ -44,14 +44,14 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2019/05/20/getting-started-etcd.html</loc>
+    <loc>https://www.oneops.co/2019/02/25/etcd-discovery.html</loc>
     
     <lastmod>2019-05-20T06:57:37.620Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2019/02/25/etcd-discovery.html</loc>
+    <loc>https://www.oneops.co/2019/05/20/getting-started-etcd.html</loc>
     
     <lastmod>2019-05-20T06:57:37.620Z</lastmod>
     
@@ -86,14 +86,14 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/baidu_verify_D9egdwp9U7.html</loc>
+    <loc>https://www.oneops.co/googled18515fcec64d15c.html</loc>
     
     <lastmod>2019-05-20T06:57:37.620Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/googled18515fcec64d15c.html</loc>
+    <loc>https://www.oneops.co/baidu_verify_D9egdwp9U7.html</loc>
     
     <lastmod>2019-05-20T06:57:37.620Z</lastmod>
     
@@ -114,13 +114,6 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/10/23/Redis/%E5%AE%89%E8%A3%85Redis.html</loc>
-    
-    <lastmod>2019-05-20T06:57:35.010Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.oneops.co/2017/12/19/apache-add-mod_cgi.html</loc>
     
     <lastmod>2019-05-20T06:57:35.010Z</lastmod>
@@ -135,6 +128,13 @@
   </url>
   
   <url>
+    <loc>https://www.oneops.co/2017/10/23/Redis/%E5%AE%89%E8%A3%85Redis.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.010Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.oneops.co/2018/06/14/not-root-use-docker.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
@@ -142,14 +142,14 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/10/19/centos7-elasticstack.html</loc>
+    <loc>https://www.oneops.co/2017/11/08/elasticstack-standard.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/11/08/elasticstack-standard.html</loc>
+    <loc>https://www.oneops.co/2017/10/19/centos7-elasticstack.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -177,13 +177,6 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-kibana.html</loc>
-    
-    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.oneops.co/2018/08/21/elasticstack-install-logstash.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
@@ -191,14 +184,21 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/12/19/centos-install-kvm.html</loc>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html</loc>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-kibana.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/centos-install-kvm.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -226,13 +226,6 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2019/03/08/proxychains-ng.html</loc>
-    
-    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.oneops.co/2017/10/23/mariadb-install.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
@@ -240,7 +233,7 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/10/23/mariadb-master-slave.html</loc>
+    <loc>https://www.oneops.co/2019/03/08/proxychains-ng.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -255,6 +248,13 @@
   
   <url>
     <loc>https://www.oneops.co/2017/10/23/mysql-client-mycli.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/23/mariadb-master-slave.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -289,7 +289,7 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/12/19/glusterfs.html</loc>
+    <loc>https://www.oneops.co/2017/12/19/moosefs-guide.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
@@ -303,7 +303,7 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/12/19/moosefs-guide.html</loc>
+    <loc>https://www.oneops.co/2017/12/19/glusterfs.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
