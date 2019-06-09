@@ -376,6 +376,226 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2017/11/08/elasticstack-standard.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2017/11/08/elasticstack-standard.html" class="post-title-link" itemprop="https://www.oneops.co/page/4/index.html">ElasticStack部署标准规范</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-11-08 00:20:27" itemprop="dateCreated datePublished" datetime="2017-11-08T00:20:27+08:00">2017-11-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-05-20 14:57:35" itemprop="dateModified" datetime="2019-05-20T14:57:35+08:00">2019-05-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="标准化"><a href="#标准化" class="headerlink" title="标准化"></a>标准化</h1><ul>
+<li>路径规划: /data/logs/,/data/logs/access,/data/logs/error,/data/logs/run</li>
+<li>格式要求: 严格要求使用json</li>
+<li>命名规则: access_log error_log runtime_log system_log</li>
+<li>日志切割: 按天，按小时。访问,错误，程序日志按小时，系统日志按天收集。</li>
+<li>原始文本: rsync推送NAS，后删除最近三天前。</li>
+<li>消息队列: 访问日志,写入Redis_DB6，错误日志Redis_DB7,程序日志Redis_DB8</li>
+</ul>
+<h1 id="工具化"><a href="#工具化" class="headerlink" title="工具化"></a>工具化</h1><ul>
+<li>访问日志: <code>Apache</code>、<code>Nginx</code>、<code>Tomcat</code> (使用<code>file</code>插件)</li>
+<li>错误日志: <code>java</code> 日志、异常日志 (使用<code>mulitline</code>多行插件)</li>
+<li>系统日志: <code>/var/log/*</code>、<code>rsyslog</code> (使用<code>syslog</code>)</li>
+<li>运行日志: 程序写入的日志文件 (可使用<code>file</code>插件或<code>json</code>插件)</li>
+<li>网络日志: 防火墙、交换机、路由器 (<code>syslog</code>插件)</li>
+</ul>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2017/11/08/elasticstack-standard.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+         
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2017/10/24/ansible-control-windows.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1895,7 +2115,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-count">38</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1910,7 +2130,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">1</span>
+                      
+                    
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -1965,7 +2187,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">21</span>
+                      
+                    
+                    <span class="site-state-item-count">22</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

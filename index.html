@@ -376,6 +376,210 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/06/09/Harbor搭建docker仓库.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/06/09/Harbor搭建docker仓库.html" class="post-title-link" itemprop="https://www.oneops.co/index.html">Harbor搭建docker仓库</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-06-09 12:02:50 / 修改时间：12:09:34" itemprop="dateCreated datePublished" datetime="2019-06-09T12:02:50+08:00">2019-06-09</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="Harbor搭建docker仓库"><a href="#Harbor搭建docker仓库" class="headerlink" title="Harbor搭建docker仓库"></a>Harbor搭建docker仓库</h1><p>Harbor是一个用于存储和分发Docker镜像的企业级Registry服务器，通过添加一些企业必需的功能特性，例如安全、标识和管理等，扩展了开源Docker Distribution。作为一个企业级私有Registry服务器，Harbor提供了更好的性能和安全。提升用户使用Registry构建和运行环境传输镜像的效率。Harbor支持安装在多个Registry节点的镜像资源复制，镜像全部保存在私有Registry中， 确保数据和知识产权在公司内部网络中管控。另外，Harbor也提供了高级的安全特性，诸如用户管理，访问控制和活动审计等。</p>
+<h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><ul>
+<li>基于角色的访问控制 ：用户与Docker镜像仓库通过“项目”进行组织管理，一个用户可以对多个镜像仓库在同一命名空间（project）里有不同的权限。</li>
+<li>镜像复制 ： 镜像可以在多个Registry实例中复制（同步）。尤其适合于负载均衡，高可用，混合云和多云的场景。</li>
+<li>图形化用户界面 ： 用户可以通过浏览器来浏览，检索当前Docker镜像仓库，管理项目和命名空间。</li>
+<li>AD/LDAP 支持 ： Harbor可以集成企业内部已有的AD/LDAP，用于鉴权认证管理。</li>
+<li>审计管理 ： 所有针对镜像仓库的操作都可以被记录追溯，用于审计管理。</li>
+<li>国际化 ： 已拥有英文、中文、德文、日文和俄文的本地化版本。更多的语言将会添加进来。</li>
+<li>RESTful API ： RESTful API 提供给管理员对于Harbor更多的操控, 使得与其它管理软件集成变得更容易。</li>
+<li>部署简单 ： 提供在线和离线两种安装工具， 也可以安装到vSphere平台(OVA方式)虚拟设备。</li>
+</ul>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/06/09/Harbor搭建docker仓库.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+         
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/05/20/base-image-docker.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -600,207 +804,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/05/20/getting-started-etcd.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Cc">
-      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
-      <meta itemprop="image" content="/images/blog/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cc's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/05/20/getting-started-etcd.html" class="post-title-link" itemprop="https://www.oneops.co/index.html">Etcd 概念介绍</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-05-20 14:57:37" itemprop="dateCreated datePublished" datetime="2019-05-20T14:57:37+08:00">2019-05-20</time>
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-symbolscount">
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">本文字数：</span>
-                
-                <span title="本文字数"></span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长"></span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="etcd是什么"><a href="#etcd是什么" class="headerlink" title="etcd是什么"></a>etcd是什么</h1><p><img src="https://www.oneops.co/images/docker/etcd_logo.png" alt="etcd_logo"></p>
-<p><code>etcd</code>是<code>CoreOS</code>团队在 2013 年 6 月发起的一个管理配置信息和服务发现服务 <code>service discovery</code> 的开源项目。它的目标是构建一个高可用的分布式键值 <code>key-value</code> 数据库，基于 <code>GO</code> 语言实现。在分布式系统中，各种服务的配置信息的管理分享、服务的发现是一个很基本同时也很重要的问题。<code>CoreOS</code> 项目就是希望基于 <code>etcd</code> 来解决这个问题。</p>
-<p><code>etcd</code> 目前在 <a href="https://github.com/coreos/etcd/" target="_blank" rel="noopener">https://github.com/coreos/etcd/</a> 进行维护,最新文档版本是<code>v3.3.12</code>,受到<a href="http://zookeeper.apache.org/" target="_blank" rel="noopener">Apache ZooKeeper</a>项目和<a href="https://github.com/ha/doozerd" target="_blank" rel="noopener">doozer</a>项目的启发，<code>etcd</code>在设计的时候重点考虑 4 个要素</p>
-<ul>
-<li><strong>简单</strong>: 具有定义良好，面向用户的 API <a href="https://github.com/grpc/grpc" target="_blank" rel="noopener">gRPC</a></li>
-<li><strong>安全</strong>: 支持 <code>HTTPS</code> 方式的访问</li>
-<li><strong>快速</strong>: 支持并发 <code>10 K/s</code> 的写操作</li>
-<li><strong>可靠</strong>: 支持分布式结构，基于 <code>raft</code> 的一致性算法</li>
-</ul>
-<p><code>Apache Zookeeper</code> 是一套知名的分布式系统中进行通过和已执行管理的工具。</p>
-<p><code>doozer</code> 是一个一致性分布式数据库</p>
-<p><a href="https://raft.github.io/" target="_blank" rel="noopener"><code>Raft</code></a> 是一套通过选举主节点来实现分布式系统一致性的算法，相比大名鼎鼎的 <code>Paxos</code> 算法，它的过程更容易让人理解。一般情况下，用户在使用 <code>etcd</code> 可以在多个节点上启动多个实例，并添加他们为一个集群。同一个集群中的 <code>etcd</code> 实例将会保持彼此信息的一致性。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/05/20/getting-started-etcd.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-         
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-       
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/05/20/use-etcd.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -946,6 +949,207 @@
           
             <div class="post-button text-center">
               <a class="btn" href="/2019/05/20/use-etcd.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+         
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/05/20/getting-started-etcd.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/05/20/getting-started-etcd.html" class="post-title-link" itemprop="https://www.oneops.co/index.html">Etcd 概念介绍</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-05-20 14:57:37" itemprop="dateCreated datePublished" datetime="2019-05-20T14:57:37+08:00">2019-05-20</time>
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="etcd是什么"><a href="#etcd是什么" class="headerlink" title="etcd是什么"></a>etcd是什么</h1><p><img src="https://www.oneops.co/images/docker/etcd_logo.png" alt="etcd_logo"></p>
+<p><code>etcd</code>是<code>CoreOS</code>团队在 2013 年 6 月发起的一个管理配置信息和服务发现服务 <code>service discovery</code> 的开源项目。它的目标是构建一个高可用的分布式键值 <code>key-value</code> 数据库，基于 <code>GO</code> 语言实现。在分布式系统中，各种服务的配置信息的管理分享、服务的发现是一个很基本同时也很重要的问题。<code>CoreOS</code> 项目就是希望基于 <code>etcd</code> 来解决这个问题。</p>
+<p><code>etcd</code> 目前在 <a href="https://github.com/coreos/etcd/" target="_blank" rel="noopener">https://github.com/coreos/etcd/</a> 进行维护,最新文档版本是<code>v3.3.12</code>,受到<a href="http://zookeeper.apache.org/" target="_blank" rel="noopener">Apache ZooKeeper</a>项目和<a href="https://github.com/ha/doozerd" target="_blank" rel="noopener">doozer</a>项目的启发，<code>etcd</code>在设计的时候重点考虑 4 个要素</p>
+<ul>
+<li><strong>简单</strong>: 具有定义良好，面向用户的 API <a href="https://github.com/grpc/grpc" target="_blank" rel="noopener">gRPC</a></li>
+<li><strong>安全</strong>: 支持 <code>HTTPS</code> 方式的访问</li>
+<li><strong>快速</strong>: 支持并发 <code>10 K/s</code> 的写操作</li>
+<li><strong>可靠</strong>: 支持分布式结构，基于 <code>raft</code> 的一致性算法</li>
+</ul>
+<p><code>Apache Zookeeper</code> 是一套知名的分布式系统中进行通过和已执行管理的工具。</p>
+<p><code>doozer</code> 是一个一致性分布式数据库</p>
+<p><a href="https://raft.github.io/" target="_blank" rel="noopener"><code>Raft</code></a> 是一套通过选举主节点来实现分布式系统一致性的算法，相比大名鼎鼎的 <code>Paxos</code> 算法，它的过程更容易让人理解。一般情况下，用户在使用 <code>etcd</code> 可以在多个节点上启动多个实例，并添加他们为一个集群。同一个集群中的 <code>etcd</code> 实例将会保持彼此信息的一致性。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/05/20/getting-started-etcd.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -2272,217 +2476,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/02/25/etcd-discovery.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Cc">
-      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
-      <meta itemprop="image" content="/images/blog/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cc's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/02/25/etcd-discovery.html" class="post-title-link" itemprop="https://www.oneops.co/index.html">基于动态发现方式部署Etcd集群</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-02-25 10:48:16" itemprop="dateCreated datePublished" datetime="2019-02-25T10:48:16+08:00">2019-02-25</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-05-20 14:57:37" itemprop="dateModified" datetime="2019-05-20T14:57:37+08:00">2019-05-20</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术之道/" itemprop="url" rel="index"><span itemprop="name">技术之道</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-symbolscount">
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">本文字数：</span>
-                
-                <span title="本文字数"></span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长"></span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>etcd 提供了多钟方式来构建高可用集群，在「<a href="https://www.oneops.co/2019/02/22/static-etcd.html">基于静态发现方式部署Etcd集群</a>」中介绍了通过静态方式部署集群。</p>
-<p>如果你只知道需要搭建一个集群，但是不能事先知道集群各个节点的 ip ，从而无法使用 <code>--initial-cluster</code> 参数。这个时候，就需要使用  Discovery 模式来构建 etcd 集群。discovery 模式分为两种 <a href="https://coreos.com/etcd/docs/latest/op-guide/clustering.html#etcd-discovery" target="_blank" rel="noopener">etcd Discovery</a> 和 <a href="https://coreos.com/etcd/docs/latest/op-guide/clustering.html#dns-discovery" target="_blank" rel="noopener">DNS Discovery</a>。</p>
-<p>本文介绍通过 <code>etcd Discovery</code> 方式构建 etcd 集群。这个启动方式需要依赖应为一个现有的 etcd 集群，在集群中创建一个工作目录，并创建一个 <code>_config</code>的子目录。并且在该子目录中增加一个 <code>size</code>节点，指定集群中的节点数量。在这种情况下，将该目录在 <code>etcd</code> 中的 URL 作为节点的启动参数，即可完成集群启动。</p>
-<h2 id="部署-etcd-集群"><a href="#部署-etcd-集群" class="headerlink" title="部署 etcd 集群"></a>部署 etcd 集群</h2><h3 id="获取集群标示"><a href="#获取集群标示" class="headerlink" title="获取集群标示"></a>获取集群标示</h3><p><code>etcd discovery</code> 集群方式分为两种：自定义的 <code>etcd discovery</code> 和公共 <code>etcd discovery</code>。</p>
-<p>获取集群标识依赖一个存在的etcd集群 这里通过 CoreOS 提供的公共 discovery(CoreOS提供) 服务申请 token。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//命令会生成一个带有 token 的 URL，参数 size 代表集群的节点数量</span><br><span class="line">curl -w &quot;\n&quot; https://discovery.etcd.io/new?size=3</span><br><span class="line">https://discovery.etcd.io/056f8be429e5829ad6bbcd1ab31bace1</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/02/25/etcd-discovery.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-         
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-       
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2532,7 +2525,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">37</span>
+                    <span class="site-state-item-count">38</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2547,7 +2540,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">1</span>
+                      
+                    
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -2602,7 +2597,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">21</span>
+                      
+                    
+                    <span class="site-state-item-count">22</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
