@@ -142,21 +142,7 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-filebeat.html</loc>
-    
-    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.oneops.co/2017/11/08/elasticstack-standard.html</loc>
-    
-    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.oneops.co/2019/04/09/elasticsearch-performance-improvement.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -170,6 +156,20 @@
   </url>
   
   <url>
+    <loc>https://www.oneops.co/2019/04/09/elasticsearch-performance-improvement.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-filebeat.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.oneops.co/2018/08/21/elasticstack-install-kibana.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
@@ -177,14 +177,14 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-logstash.html</loc>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html</loc>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-logstash.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -254,7 +254,7 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/01/10/consul-guide.html</loc>
+    <loc>https://www.oneops.co/2018/01/10/use-consul.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
@@ -268,7 +268,7 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/12/19/install-glusterfs.html</loc>
+    <loc>https://www.oneops.co/2018/01/10/consul-guide.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
@@ -276,6 +276,13 @@
   
   <url>
     <loc>https://www.oneops.co/2017/12/19/glusterfs.html</loc>
+    
+    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/12/19/install-glusterfs.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
@@ -290,13 +297,6 @@
   
   <url>
     <loc>https://www.oneops.co/2017/10/24/ansible-control-windows.html</loc>
-    
-    <lastmod>2019-05-20T06:57:34.990Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.oneops.co/2018/01/10/use-consul.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
