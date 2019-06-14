@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://www.oneops.co/2019/06/09/Harbor%E6%90%AD%E5%BB%BAdocker%E4%BB%93%E5%BA%93.html</loc>
+    <loc>https://www.oneops.co/2019/06/15/kubernetes-install-binary.html</loc>
     
-    <lastmod>2019-06-09T04:11:01.633Z</lastmod>
+    <lastmod>2019-06-14T16:52:03.860Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/06/09/docker-harbor.html</loc>
+    
+    <lastmod>2019-06-14T16:47:11.772Z</lastmod>
     
   </url>
   
@@ -149,14 +156,14 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-elasticsearch.html</loc>
+    <loc>https://www.oneops.co/2019/04/09/elasticsearch-performance-improvement.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2019/04/09/elasticsearch-performance-improvement.html</loc>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-elasticsearch.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -177,14 +184,14 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html</loc>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-logstash.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-logstash.html</loc>
+    <loc>https://www.oneops.co/2018/08/21/elasticstack-install-x-pack.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -198,13 +205,6 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/12/19/fishshell.html</loc>
-    
-    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.oneops.co/2017/12/14/autojump.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
@@ -212,7 +212,7 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2019/03/07/shadowsocks-vpn.html</loc>
+    <loc>https://www.oneops.co/2017/12/19/fishshell.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -220,6 +220,13 @@
   
   <url>
     <loc>https://www.oneops.co/2019/03/08/proxychains-ng.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2019/03/07/shadowsocks-vpn.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
     
@@ -240,13 +247,6 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/10/23/mysql-clean-binlog.html</loc>
-    
-    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.oneops.co/2017/10/23/mysql-client-mycli.html</loc>
     
     <lastmod>2019-05-20T06:57:35.000Z</lastmod>
@@ -254,14 +254,21 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/01/10/use-consul.html</loc>
+    <loc>https://www.oneops.co/2017/10/23/mysql-clean-binlog.html</loc>
+    
+    <lastmod>2019-05-20T06:57:35.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://www.oneops.co/2017/10/24/ansible-control-windows.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2018/01/10/consul-nginx.html</loc>
+    <loc>https://www.oneops.co/2018/01/10/use-consul.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
@@ -275,7 +282,7 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/12/19/glusterfs.html</loc>
+    <loc>https://www.oneops.co/2018/01/10/consul-nginx.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
@@ -289,14 +296,14 @@
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/12/19/moosefs-guide.html</loc>
+    <loc>https://www.oneops.co/2017/12/19/glusterfs.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.oneops.co/2017/10/24/ansible-control-windows.html</loc>
+    <loc>https://www.oneops.co/2017/12/19/moosefs-guide.html</loc>
     
     <lastmod>2019-05-20T06:57:34.990Z</lastmod>
     
