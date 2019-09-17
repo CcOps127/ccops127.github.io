@@ -108,23 +108,25 @@
 
 
 
-  <meta name="description" content="Love Linux ♥ Love Python. 猴赛雷">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Cc&#39;s Blog">
-<meta property="og:url" content="https://www.oneops.co/tags/apache/index.html">
+  <meta name="description" content="Nginx location 配置语法 location的作用是将访问的链接定位到资源上，进而修改资源的一些属性（如设置图片的缓存）或者是确定图片的位置，可能是本地的资源，也有可能是proxy_pass代理的后端服务。  基本语法1234Syntax:  location [=|~|~*|^~] uri &amp;#123; ... &amp;#125;location @name &amp;#123; ... &amp;#12">
+<meta name="keywords" content="nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="location配置语法">
+<meta property="og:url" content="https://www.oneops.co/2019/09/17/nginx-location.html">
 <meta property="og:site_name" content="Cc&#39;s Blog">
-<meta property="og:description" content="Love Linux ♥ Love Python. 猴赛雷">
+<meta property="og:description" content="Nginx location 配置语法 location的作用是将访问的链接定位到资源上，进而修改资源的一些属性（如设置图片的缓存）或者是确定图片的位置，可能是本地的资源，也有可能是proxy_pass代理的后端服务。  基本语法1234Syntax:  location [=|~|~*|^~] uri &amp;#123; ... &amp;#125;location @name &amp;#123; ... &amp;#12">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-17T15:39:21.080Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Cc&#39;s Blog">
-<meta name="twitter:description" content="Love Linux ♥ Love Python. 猴赛雷">
+<meta name="twitter:title" content="location配置语法">
+<meta name="twitter:description" content="Nginx location 配置语法 location的作用是将访问的链接定位到资源上，进而修改资源的一些属性（如设置图片的缓存）或者是确定图片的位置，可能是本地的资源，也有可能是proxy_pass代理的后端服务。  基本语法1234Syntax:  location [=|~|~*|^~] uri &amp;#123; ... &amp;#125;location @name &amp;#123; ... &amp;#12">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.oneops.co/tags/apache/">
+  <link rel="canonical" href="https://www.oneops.co/2019/09/17/nginx-location.html">
 
 
 
@@ -134,7 +136,7 @@
   };
 </script>
 
-  <title>标签: apache | Cc's Blog</title>
+  <title>location配置语法 | Cc's Blog</title>
   
 
 
@@ -192,7 +194,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -250,7 +252,7 @@
         
         
           
-          <li class="menu-item menu-item-tags menu-item-active">
+          <li class="menu-item menu-item-tags">
 
     
     
@@ -355,79 +357,324 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>apache<small>标签</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
+
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/09/17/nginx-location.html">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Cc">
+      <meta itemprop="description" content="Love Linux ♥ Love Python. 猴赛雷">
+      <meta itemprop="image" content="/images/blog/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cc's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2017/12/19/apache-add-mod_cgi.html" itemprop="url">
-              
-                <span itemprop="name">Apache添加cgi模块</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">location配置语法
+              
+            
+          </h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2017-12-19T23:15:39+08:00" content="2017-12-19">
-          12-19
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
 
-    </header>
-  </article>
+            
+            
+            
 
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-17 23:38:21 / 修改时间：23:39:21" itemprop="dateCreated datePublished" datetime="2019-09-17T23:38:21+08:00">2019-09-17</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon">
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Nginx-location-配置语法"><a href="#Nginx-location-配置语法" class="headerlink" title="Nginx location 配置语法"></a>Nginx location 配置语法</h1><blockquote>
+<p>location的作用是将访问的链接定位到资源上，进而修改资源的一些属性（如设置图片的缓存）或者是确定图片的位置，可能是本地的资源，也有可能是proxy_pass代理的后端服务。</p>
+</blockquote>
+<h2 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Syntax:  location [=|~|~*|^~] uri &#123; ... &#125;</span><br><span class="line">location @name &#123; ... &#125;</span><br><span class="line">Default:  —</span><br><span class="line">Context:  server, location</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<ul>
+<li><code>=</code> 严格匹配。如果这个查询匹配，那么将停止搜索并立即处理此请求</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location = /index &#123;</span><br><span class="line">    [ configuration A ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">URL为 http://&#123;domain_name&#125;/index 时，才会执行配置中操作。</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>~</code> 表示执行正则匹配，但是区分大小写</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location ~ /page/\d&#123;1,2&#125; &#123;</span><br><span class="line">    [ configuration B ]</span><br><span class="line">&#125;</span><br><span class="line">URL 为 http://&#123;domain_name&#125;/page/1 匹配结尾数字为1-99时，配置生效。</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>~*</code> 表示执行正则匹配，但是不区分大小写</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location ~* /\.(jpg|jpeg|gif) &#123;</span><br><span class="line">    [ configuration C ]</span><br><span class="line">&#125;</span><br><span class="line">匹配所有url以jpg、jpeg、gif结尾时，配置生效。</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>^~</code> 表示普通字符匹配，前缀匹配有效，配置生效</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">location ^~ /images/ &#123;</span><br><span class="line">[ cofigurations D ]</span><br><span class="line">&#125;</span><br><span class="line">URL 为 http://&#123;domain_name&#125;/images/1.gif 时，配置生效。</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>如果没有上述四种符号，则默认为<code>=</code></p>
+</li>
+<li><p><code>@</code> 定义一个location，用于处理内部重定向</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location @error &#123;</span><br><span class="line">    proxy_pass http://error;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">error_page 404 @error;</span><br></pre></td></tr></table></figure>
+<h2 id="各字符有效优先级"><a href="#各字符有效优先级" class="headerlink" title="各字符有效优先级"></a>各字符有效优先级</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">= &gt; ^~ &gt; ~/~*</span><br><span class="line">当(~/~*)中有多个正则匹配时，选择正则表达式最长的配置执行。</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>=</code>前缀的指令严格匹配这个查询。如果找到，停止搜索。</li>
+<li>所有剩下的常规字符串，最长的匹配。如果这个匹配使用<code>^~</code>前缀，搜索停止。</li>
+<li>正则表达式，在配置文件中定义的顺序。</li>
+<li>如果第3条规则产生匹配的话，结果被使用。否则，使用第2条规则的结果。</li>
+</ul>
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># 第1段</span><br><span class="line">location ~* \.(?:css|js)$ &#123;</span><br><span class="line"> expires 30d;</span><br><span class="line"> access_log off;</span><br><span class="line"> add_header Cache-Control &quot;public&quot;;</span><br><span class="line"> root /data/web/static/;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 第2段</span><br><span class="line">location /static/ &#123;</span><br><span class="line">   root /data/web/static/;</span><br><span class="line">   index index.html;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为后端是用proxy_pass 服务代理的方式，而静态文件/static/文件夹下的文件没必要走后端了，于是就有了第2段配置，同时又需要给css和js文件设置缓存时间，所以也有了第1段的配置。</p>
 
       
     </div>
 
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nginx/" rel="tag"> <i class="fa fa-tag"></i> nginx</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+               <div>
+                 
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+               </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/12/logstsh-nginx-json-logs.html" rel="next" title="logstash收集nginx日志">
+                <i class="fa fa-chevron-left"></i> logstash收集nginx日志
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+  </div>
 
 
           </div>
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjY0MS8xOTE4OA=="></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -448,8 +695,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -581,6 +837,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Nginx-location-配置语法"><span class="nav-number">1.</span> <span class="nav-text">Nginx location 配置语法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本语法"><span class="nav-number">1.1.</span> <span class="nav-text">基本语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各字符有效优先级"><span class="nav-number">1.2.</span> <span class="nav-text">各字符有效优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实战"><span class="nav-number">1.3.</span> <span class="nav-text">实战</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -742,6 +1014,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
 
   
 
@@ -754,6 +1030,20 @@
 
 
 
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/09/17/nginx-location.html'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
