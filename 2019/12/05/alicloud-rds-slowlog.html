@@ -108,28 +108,25 @@
 
 
 
-  <meta name="description" content="什么是Fish ShellFISH（friendly interactive shell）是一个用户友好的命令行 shell，主要是用来进行交互式使用。shell 就是一个用来执行其他程序的程序。  Fish Shell特性自动建议fish 会根据你的历史输入和补完来提供命令建议，就像一个网络浏览器一样。注意了，就是Netscape Navigator 4.0  漂亮的VGA 色彩fish 原生支">
-<meta name="keywords" content="filshshell">
+  <meta name="description" content="使用 python3 获取 RDS 的 Slowlog，在将 slowlog 发送给 kafka。 config.py配置所需要的信息">
+<meta name="keywords" content="python3">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Fishshell">
-<meta property="og:url" content="https://www.oneops.co/2017/12/19/fishshell.html">
+<meta property="og:title" content="python3获取阿里云RDS slowlog.md">
+<meta property="og:url" content="https://www.oneops.co/2019/12/05/alicloud-rds-slowlog.html">
 <meta property="og:site_name" content="Cc&#39;s Blog">
-<meta property="og:description" content="什么是Fish ShellFISH（friendly interactive shell）是一个用户友好的命令行 shell，主要是用来进行交互式使用。shell 就是一个用来执行其他程序的程序。  Fish Shell特性自动建议fish 会根据你的历史输入和补完来提供命令建议，就像一个网络浏览器一样。注意了，就是Netscape Navigator 4.0  漂亮的VGA 色彩fish 原生支">
+<meta property="og:description" content="使用 python3 获取 RDS 的 Slowlog，在将 slowlog 发送给 kafka。 config.py配置所需要的信息">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://www.oneops.co/images/bash/fish-shell.png">
-<meta property="og:image" content="https://www.oneops.co/images/bash/fish-shell.gif">
-<meta property="og:updated_time" content="2019-09-17T15:52:17.338Z">
+<meta property="og:updated_time" content="2019-12-05T15:36:54.574Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Fishshell">
-<meta name="twitter:description" content="什么是Fish ShellFISH（friendly interactive shell）是一个用户友好的命令行 shell，主要是用来进行交互式使用。shell 就是一个用来执行其他程序的程序。  Fish Shell特性自动建议fish 会根据你的历史输入和补完来提供命令建议，就像一个网络浏览器一样。注意了，就是Netscape Navigator 4.0  漂亮的VGA 色彩fish 原生支">
-<meta name="twitter:image" content="https://www.oneops.co/images/bash/fish-shell.png">
+<meta name="twitter:title" content="python3获取阿里云RDS slowlog.md">
+<meta name="twitter:description" content="使用 python3 获取 RDS 的 Slowlog，在将 slowlog 发送给 kafka。 config.py配置所需要的信息">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.oneops.co/2017/12/19/fishshell.html">
+  <link rel="canonical" href="https://www.oneops.co/2019/12/05/alicloud-rds-slowlog.html">
 
 
 
@@ -139,7 +136,7 @@
   };
 </script>
 
-  <title>Fishshell | Cc's Blog</title>
+  <title>python3获取阿里云RDS slowlog.md | Cc's Blog</title>
   
 
 
@@ -380,7 +377,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2017/12/19/fishshell.html">
+    <link itemprop="mainEntityOfPage" href="https://www.oneops.co/2019/12/05/alicloud-rds-slowlog.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Cc">
@@ -397,7 +394,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Fishshell
+          <h1 class="post-title" itemprop="name headline">python3获取阿里云RDS slowlog.md
               
             
           </h1>
@@ -422,24 +419,12 @@
                 
               
 
-              <time title="创建时间：2017-12-19 23:13:38" itemprop="dateCreated datePublished" datetime="2017-12-19T23:13:38+08:00">2017-12-19</time>
+              <time title="创建时间：2019-12-05 23:27:19 / 修改时间：23:36:54" itemprop="dateCreated datePublished" datetime="2019-12-05T23:27:19+08:00">2019-12-05</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-09-17 23:52:17" itemprop="dateModified" datetime="2019-09-17T23:52:17+08:00">2019-09-17</time>
               
             
           </span>
@@ -456,7 +441,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
 
                 
                 
@@ -525,18 +510,16 @@
       
 
       
-        <h1 id="什么是Fish-Shell"><a href="#什么是Fish-Shell" class="headerlink" title="什么是Fish Shell"></a>什么是Fish Shell</h1><p>FISH（friendly interactive shell）是一个用户友好的命令行 shell，主要是用来进行交互式使用。shell 就是一个用来执行其他程序的程序。</p>
-<p><img src="https://www.oneops.co/images/bash/fish-shell.png" alt="Fish-Shell"></p>
-<h1 id="Fish-Shell特性"><a href="#Fish-Shell特性" class="headerlink" title="Fish Shell特性"></a>Fish Shell特性</h1><h2 id="自动建议"><a href="#自动建议" class="headerlink" title="自动建议"></a>自动建议</h2><p>fish 会根据你的历史输入和补完来提供命令建议，就像一个网络浏览器一样。注意了，就是Netscape Navigator 4.0</p>
-<p><img src="https://www.oneops.co/images/bash/fish-shell.gif" alt="Fish-Shell"></p>
-<h2 id="漂亮的VGA-色彩"><a href="#漂亮的VGA-色彩" class="headerlink" title="漂亮的VGA 色彩"></a>漂亮的VGA 色彩</h2><p>fish 原生支持 term256， 它就是一个终端技术的艺术国度。 你将可以拥有一个难以置信的、256 色的shell 来使用。</p>
+        <p>使用 python3 获取 RDS 的 Slowlog，在将 slowlog 发送给 kafka。</p>
+<h2 id="config-py"><a href="#config-py" class="headerlink" title="config.py"></a>config.py</h2><p>配置所需要的信息</p>
 <a id="more"></a>
-<h2 id="理智的脚本"><a href="#理智的脚本" class="headerlink" title="理智的脚本"></a>理智的脚本</h2><p>fish 是完全可以通过脚本控制的，而且它的语法又是那么的简单、干净，而且一致。你甚至不需要去重写。</p>
-<h2 id="基于-web-的配置"><a href="#基于-web-的配置" class="headerlink" title="基于 web 的配置"></a>基于 web 的配置</h2><p>对于少数能使用图形计算机的幸运儿， 你们可以在网页上配置你们自己的色彩方案，以及查看函数、变量和历史记录。</p>
-<h2 id="帮助手册补全"><a href="#帮助手册补全" class="headerlink" title="帮助手册补全"></a>帮助手册补全</h2><p>其它的 shell 支持可配置的补全， 但是只有 fish 可以通过自动转换你安装好的 man 手册来实现补全功能。</p>
-<h2 id="开箱即用"><a href="#开箱即用" class="headerlink" title="开箱即用"></a>开箱即用</h2><p>fish 将会通过 tab 补全和语法高亮使你非常愉快的使用shell， 同时不需要太多的学习或者配置。</p>
-<h1 id="安装Fish-Shell"><a href="#安装Fish-Shell" class="headerlink" title="安装Fish Shell"></a>安装Fish Shell</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">对于 CentOS 7，请以 根用户 root 运行下面命令：</span><br><span class="line">cd /etc/yum.repos.d/</span><br><span class="line">wget http://download.opensuse.org/repositories/shells:fish:release:2/CentOS_7/shells:fish:release:2.repo</span><br><span class="line">yum install fish</span><br><span class="line"></span><br><span class="line">对于 CentOS 6，请以 根用户 root 运行下面命令：</span><br><span class="line">cd /etc/yum.repos.d/</span><br><span class="line">wget http://download.opensuse.org/repositories/shells:fish:release:2/CentOS_6/shells:fish:release:2.repo</span><br><span class="line">yum install fish</span><br><span class="line"></span><br><span class="line">对于 CentOS 5，请以 根用户 root 运行下面命令：</span><br><span class="line">cd /etc/yum.repos.d/</span><br><span class="line">wget http://download.opensuse.org/repositories/shells:fish:release:2/CentOS_5/shells:fish:release:2.repo</span><br><span class="line">yum install fish</span><br></pre></td></tr></table></figure>
-<p>附: <a href="http://software.opensuse.org/download.html?project=shells%3Afish%3Arelease%3A2&amp;package=fish" target="_blank" rel="noopener">主流类UNIX系统安装方法介绍</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">AccessKeyId = &apos;AccessKeyId&apos;</span><br><span class="line">AccessKeySecret = &apos;AccessKeySecret&apos;</span><br><span class="line">region = &apos;region-ID&apos;</span><br><span class="line">dbID = &apos;RDS-dbID&apos;</span><br><span class="line">KAFKA_HOST = &apos;KAFKA_HOST-01:9092,KAFKA_HOST-02:9092,KAFKA_HOST-03:9092&apos;</span><br><span class="line">TOPIC = &apos;rds-slowlog&apos;</span><br><span class="line">ES_INDEX = &apos;ali-rds-slowlog&apos;</span><br></pre></td></tr></table></figure>
+<h2 id="logger-py"><a href="#logger-py" class="headerlink" title="logger.py"></a>logger.py</h2><p>用于脚本日志记录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">from logging import handlers</span><br><span class="line"></span><br><span class="line">import logging</span><br><span class="line">import time</span><br><span class="line">import os</span><br><span class="line"></span><br><span class="line">class Logger(object):</span><br><span class="line">    # 日志级别关系映射</span><br><span class="line">    level_relations = &#123;</span><br><span class="line">        &apos;debug&apos;:logging.DEBUG,</span><br><span class="line">        &apos;info&apos;:logging.INFO,</span><br><span class="line">        &apos;warning&apos;:logging.WARNING,</span><br><span class="line">        &apos;error&apos;:logging.ERROR,</span><br><span class="line">        &apos;crit&apos;:logging.CRITICAL</span><br><span class="line">    &#125;</span><br><span class="line">    # 定义日志路径和格式</span><br><span class="line">    logname = &quot;&#123;&#125;/logs/send2kafka.log_&#123;&#125;&quot;.format(os.getcwd(),time.strftime(&quot;%Y-%m-%d&quot;))</span><br><span class="line">    log_format = &apos;%(asctime)s %(levelname)s: %(message)s&apos;</span><br><span class="line">    log_path=&quot;&#123;&#125;/logs&quot;.format(os.getcwd())</span><br><span class="line">    if not os.path.exists(log_path):</span><br><span class="line">        os.mkdir(log_path)</span><br><span class="line"></span><br><span class="line">    def __init__(self,logname=logname,level=&apos;info&apos;,when=&apos;D&apos;,backCount=3,format=log_format,):</span><br><span class="line">        # 初始化 logging 参数</span><br><span class="line">        # 获取 logger 实例，如果参数为空返回 root logger</span><br><span class="line">        self.logger = logging.getLogger(logname)</span><br><span class="line">        # 指定日志格式</span><br><span class="line">        format_str = logging.Formatter(format)</span><br><span class="line">        # 指定日志级别</span><br><span class="line">        self.logger.setLevel(self.level_relations.get(level))</span><br><span class="line">        # 日志打印终端</span><br><span class="line">        terminal_log = logging.StreamHandler()</span><br><span class="line">        terminal_log.setFormatter(format_str)</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        日志打印文件</span><br><span class="line">        TimedRotatingFileHandler 为根据时间间隔轮滚</span><br><span class="line">        实例化TimedRotatingFileHandler</span><br><span class="line">        interval是时间间隔，backupCount是备份文件的个数，如果超过这个个数，就会自动删除，when是间隔的时间单位，单位有以下几种：</span><br><span class="line">        S 秒, M 分, H 小时,D 天,W 每星期（interval==0时代表星期一）,midnight 每天凌晨</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        #file_log = logging.handlers.TimedRotatingFileHandler(filename=logname, when=when,backupCount=backCount, encoding=&apos;utf-8&apos;)</span><br><span class="line">        file_log = logging.FileHandler(filename=logname, mode=&apos;a&apos;, encoding=&apos;utf-8&apos;)</span><br><span class="line">        file_log.setFormatter(format_str)</span><br><span class="line"></span><br><span class="line">        # 添加日志处理器</span><br><span class="line">        self.logger.addHandler(file_log)</span><br><span class="line">        #self.logger.addHandler(terminal_log)</span><br></pre></td></tr></table></figure>
+<h2 id="slowlog-rds-py"><a href="#slowlog-rds-py" class="headerlink" title="slowlog_rds.py"></a>slowlog_rds.py</h2><p>使用阿里云提供的 python sdk 获取 slowlog</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">from aliyunsdkcore.client import AcsClient</span><br><span class="line">from aliyunsdkcore.acs_exception.exceptions import ClientException</span><br><span class="line">from aliyunsdkcore.acs_exception.exceptions import ServerException</span><br><span class="line">from aliyunsdkrds.request.v20140815.DescribeSlowLogRecordsRequest import DescribeSlowLogRecordsRequest</span><br><span class="line"></span><br><span class="line">from config import *</span><br><span class="line">from logger import Logger</span><br><span class="line">import time</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line">write_log = Logger().logger</span><br><span class="line"></span><br><span class="line">class ali_RDS(object):</span><br><span class="line">    def __init__(self,dbID,startTime,endTime):</span><br><span class="line">        self.dbID = dbID</span><br><span class="line">        self.startTime = startTime</span><br><span class="line">        self.endTime = endTime</span><br><span class="line"></span><br><span class="line">    def slowlogGet(self):</span><br><span class="line">        try:</span><br><span class="line">            client = AcsClient(AccessKeyId, AccessKeySecret, region)</span><br><span class="line">            request = DescribeSlowLogRecordsRequest()</span><br><span class="line">            request.set_accept_format(&apos;json&apos;)</span><br><span class="line">            request.set_DBInstanceId(self.dbID)</span><br><span class="line">            request.set_StartTime(self.startTime)</span><br><span class="line">            request.set_EndTime(self.endTime)</span><br><span class="line">            response = client.do_action_with_exception(request)</span><br><span class="line">            data = json.loads(response)</span><br><span class="line">            return data</span><br><span class="line">        except Exception as e:</span><br><span class="line">            write_log.error(str(e))</span><br></pre></td></tr></table></figure>
+<h2 id="send2kafka-py"><a href="#send2kafka-py" class="headerlink" title="send2kafka.py"></a>send2kafka.py</h2><p>将获取的 slowlog 发送给 kafka，也可以结合企业微信进行报警</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">from kafka import KafkaProducer</span><br><span class="line">from config import *</span><br><span class="line">from slowlog_rds import *</span><br><span class="line">from datetime import datetime</span><br><span class="line">from logger import Logger</span><br><span class="line">from dateutil.tz import tzlocal</span><br><span class="line">import json</span><br><span class="line">import time</span><br><span class="line">import sys</span><br><span class="line">import pysnooper</span><br><span class="line">import arrow</span><br><span class="line"></span><br><span class="line">write_log = Logger().logger</span><br><span class="line"></span><br><span class="line"># kafka 生产者函数，需要指定kafka Topic 和 生产的消息</span><br><span class="line">def syncKafka(topic,msg):</span><br><span class="line">    producer = KafkaProducer(bootstrap_servers=KAFKA_HOST,value_serializer=lambda v: json.dumps(v).encode(&apos;utf-8&apos;))</span><br><span class="line">    producer.send(topic,msg)</span><br><span class="line">    producer.close()</span><br><span class="line"></span><br><span class="line"># 格式化 RDS 的 slowlog 为 json格式，并添加 @timestamp 和 field.service 字段</span><br><span class="line">def formatLog(log):</span><br><span class="line">    for line in log[&apos;Items&apos;][&apos;SQLSlowRecord&apos;]:</span><br><span class="line">    # ReturnRowCounts = line[&apos;ReturnRowCounts&apos;]         返回行数</span><br><span class="line">    # HostAddress = line[&apos;HostAddress&apos;]                 连接数据库的客户端地址</span><br><span class="line">    # SQLText = line[&apos;SQLText&apos;]                         查询语句</span><br><span class="line">    # LockTimes = line[&apos;LockTimes&apos;]                     锁定时长，单位：秒</span><br><span class="line">    # ExecutionStartTime =line[&apos;ExecutionStartTime&apos;]    执行开始时间，格式：yyyy-MM-ddTHH:mm:ssZ（UTC时间）</span><br><span class="line">    # ParseRowCounts = line[&apos;ParseRowCounts&apos;]           解析行数</span><br><span class="line">    # QueryTimes = line[&apos;QueryTimes&apos;]                   执行时长，单位：秒</span><br><span class="line">    # DBName = line[&apos;DBName&apos;]                           数据库名称</span><br><span class="line">        line[&apos;fields&apos;] = &#123;&#125;</span><br><span class="line">        line[&apos;fields&apos;][&apos;service&apos;] = ES_INDEX</span><br><span class="line">        ExecutionStartTime = arrow.get(line[&apos;ExecutionStartTime&apos;]).to(&quot;local&quot;)</span><br><span class="line">        line[&apos;@timestamp&apos;]=str(ExecutionStartTime)</span><br><span class="line">        yield line</span><br><span class="line"></span><br><span class="line"># 获取RDS Slowlog，格式化成为 Json 格式后发送消息到 kafka</span><br><span class="line">def sendToKafka(startTime,endTime):</span><br><span class="line">    rdslog=ali_RDS(dbID,startTime,endTime).slowlogGet()</span><br><span class="line">    try:</span><br><span class="line">        for slowlog in formatLog(rdslog):</span><br><span class="line">            syncKafka(TOPIC,slowlog)</span><br><span class="line">            write_log.info(slowlog)</span><br><span class="line">    except Exception as e:</span><br><span class="line">        write_log.error(str(e))</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    while True:</span><br><span class="line">        # 通过 API 获取的 RDS Slowlog 为 UTC 时间，故需要在当前时间减去 8 小时,每个60秒获取一次日志</span><br><span class="line">        try:</span><br><span class="line">            startTime = time.strftime(&apos;%Y-%m-%dT%H:%MZ&apos;,time.localtime(time.time() - 28860 ))</span><br><span class="line">            endTime = time.strftime(&apos;%Y-%m-%dT%H:%MZ&apos;,time.localtime(time.time() - 28800 ))</span><br><span class="line">            sendToKafka(startTime,endTime)</span><br><span class="line">            time.sleep(60)</span><br><span class="line">        except Exception as e:</span><br><span class="line">            write_log.error(str(e))</span><br><span class="line">            sys.exit()</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -560,7 +543,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/filshshell/" rel="tag"> <i class="fa fa-tag"></i> filshshell</a>
+            <a href="/tags/python3/" rel="tag"> <i class="fa fa-tag"></i> python3</a>
           
         </div>
       
@@ -627,8 +610,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/12/14/autojump.html" rel="next" title="autojump使用">
-                <i class="fa fa-chevron-left"></i> autojump使用
+              <a href="/2019/09/17/nginx-location.html" rel="next" title="location配置语法">
+                <i class="fa fa-chevron-left"></i> location配置语法
               </a>
             
           </div>
@@ -636,10 +619,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/12/19/apache-add-mod_cgi.html" rel="prev" title="Apache添加cgi模块">
-                Apache添加cgi模块 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -861,7 +840,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是Fish-Shell"><span class="nav-number">1.</span> <span class="nav-text">什么是Fish Shell</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Fish-Shell特性"><span class="nav-number">2.</span> <span class="nav-text">Fish Shell特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#自动建议"><span class="nav-number">2.1.</span> <span class="nav-text">自动建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漂亮的VGA-色彩"><span class="nav-number">2.2.</span> <span class="nav-text">漂亮的VGA 色彩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#理智的脚本"><span class="nav-number">2.3.</span> <span class="nav-text">理智的脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于-web-的配置"><span class="nav-number">2.4.</span> <span class="nav-text">基于 web 的配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#帮助手册补全"><span class="nav-number">2.5.</span> <span class="nav-text">帮助手册补全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开箱即用"><span class="nav-number">2.6.</span> <span class="nav-text">开箱即用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Fish-Shell"><span class="nav-number">3.</span> <span class="nav-text">安装Fish Shell</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#config-py"><span class="nav-number">1.</span> <span class="nav-text">config.py</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logger-py"><span class="nav-number">2.</span> <span class="nav-text">logger.py</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#slowlog-rds-py"><span class="nav-number">3.</span> <span class="nav-text">slowlog_rds.py</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#send2kafka-py"><span class="nav-number">4.</span> <span class="nav-text">send2kafka.py</span></a></li></ol></div>
             
 
           </div>
@@ -1047,7 +1026,7 @@
   
     <script type="text/javascript">
       window.livereOptions = {
-        refer: '2017/12/19/fishshell.html'
+        refer: '2019/12/05/alicloud-rds-slowlog.html'
       };
       (function(d, s) {
         var j, e = d.getElementsByTagName(s)[0];
